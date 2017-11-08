@@ -5,7 +5,6 @@ const colors = require('colors/safe');
 const webConfigPath = path.join(__dirname + '/../dist/web.config');
 const distPath = path.join(__dirname + '/../dist/');
 
-
 console.log(colors.cyan('\nRunning post-build tasks'));
 fs.createReadStream('build/web.config').pipe(fs.createWriteStream(webConfigPath));
 console.log(colors.green(`Web configuration copied to: ${colors.yellow(webConfigPath)}`));
