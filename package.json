@@ -1,6 +1,6 @@
 {
   "name": "sketch",
-  "version": "0.0.2-alpha.19",
+  "version": "0.0.2-alpha.50",
   "description": "Sketching tool for a new gas request. Using Angular CLI and Fabric JS",
   "scripts": {
     "ng": "ng",
