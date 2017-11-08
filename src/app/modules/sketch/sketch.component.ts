@@ -46,8 +46,8 @@ export class SketchComponent implements OnInit, AfterViewInit {
     this.bindES5ComponentsEvents();
     this.calculateCanvasSize();
     this.clearCanvas();
-
     this.plotSketchElements();
+    this.appendCustomImages();
   }
 
   validateDataModel() {
@@ -1698,6 +1698,57 @@ export class SketchComponent implements OnInit, AfterViewInit {
   resetCustomImage(event: any) {
     $('#customImagesList').empty();
   }
+
+  appendCustomImages() {
+    // This function should take as a parameter an array or Urls defined by system admin to be added dynamically to sketch
+    const imagesList: any = [];
+    const root = this;
+    const baseUrl = window.location.origin;
+
+    imagesList.push("assets/images/sketch/tree1.svg");
+    imagesList.push("assets/images/sketch/tree2.svg");
+    imagesList.push("assets/images/sketch/tree3.svg");
+    imagesList.push("assets/images/sketch/tree4.svg");
+    imagesList.push("assets/images/sketch/bushes.svg");
+
+    imagesList.push("assets/images/sketch/pool1.png");
+    imagesList.push("assets/images/sketch/pool2.png");
+    imagesList.push("assets/images/sketch/pool3.png");
+
+    imagesList.push("assets/images/sketch/fence1.svg");
+    imagesList.push("assets/images/sketch/fence2.png");
+    imagesList.push("assets/images/sketch/dog.svg");
+
+    imagesList.push("assets/images/sketch/driveway1.png");
+    imagesList.push("assets/images/sketch/driveway2.png");
+
+    imagesList.push("assets/images/sketch/septic1.png");
+    imagesList.push("assets/images/sketch/septic2.png");
+
+    imagesList.push("assets/images/sketch/meter.png");
+    imagesList.push("assets/images/sketch/gas-caution.png");
+    imagesList.push("assets/images/sketch/gas-pipeline.png");
+
+    imagesList.forEach(function (url) {
+      root.getFileBlob(url, function (blob) {
+        const reader = new FileReader();
+        const elementId = 'Img-' + root.randomId();
+        
+        reader.onload = function () {
+          $('#customImagesList').append('<div class="img-wrap"><span class="close">&times;</span><img id="'
+            + elementId + '" class="images-item" src="'
+            + reader.result + '"></div>');
+    
+          const imageElement = root.elementRef.nativeElement.querySelector('#' + elementId);
+          if (imageElement) {
+            imageElement.addEventListener('click', root.plotCustomImage.bind(root));
+          }
+        };
+
+        reader.readAsDataURL(blob);
+      });
+    });
+  }
   // #endregion
   // #region |---> [UI Elements Ops]
   clearSelection() {
@@ -2076,6 +2127,22 @@ export class SketchComponent implements OnInit, AfterViewInit {
 
     return new Blob([ab]);
   }
+
+  getFileBlob(url, cb) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url);
+    xhr.responseType = "blob";
+    xhr.addEventListener('load', function () {
+      cb(xhr.response);
+    });
+    xhr.send();
+  };
+
+  blobToFile(blob, name) {
+    blob.lastModifiedDate = new Date();
+    blob.name = name;
+    return blob;
+  };
 
   shadeColor(color: string, percent: number) {
     let r = parseInt(color.substring(1, 3), 16);
