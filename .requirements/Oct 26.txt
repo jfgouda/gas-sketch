@@ -1,0 +1,47 @@
+Sketch Notes - Oct 26
+
+[X]- Service line should be segmented as following:
+	 1- Main to curb (+/-) (BC, UP, LS, SS);
+	 2- Street  width;
+	 3- Curb to house-edge;
+	 4- House-edge to standard meter location;
+	 5- Standard meeter location to preferred meter location (if preferred-location is true);
+  
+[X]- Meter Location DDL should list [Front, Standard Right, Standard Left]:
+	 1- If preferred meter location is true, then Meter Location DDL will include [Preferred Right, Preferred Left, Custom]->Front Street and only Custom if side street;
+
+[X]- Fix fields names;
+[X]- Merge sketch parameters with site information;
+[X]- Merge Tap Location & Main Location into Tap location;
+[X]- Preferred meter location, will control the visibility of meter-setback field;
+[X]- Communicate Template Module with Sketch Module through service bus;
+[X]- Sync & Maintain Template Module values with Sketch Module which maintain the state during navigation;
+[X]- Rearrange the UI merge the Sketch Param and Site Info (Preferred above meter location);
+[X]- Add free drawing functionality to sketch;
+[ ]- Add a debug panel, to show measurement calculations to top-left;
+
+##########################################################################
+Futur Builds:
+[ ]- Consider having 4 street & 4 mains and allow user to tap service line to one of those streets;
+
+##########################################################################
+Dropped Requirements
+[/]- Add a label stating, [Drawing not to scale]; 	### Sketch is to scale now, so drop this;
+[/]- Disable the custom meter location;				### Sketch is to scale now, so drop this;
+
+##########################################################################
+Utility Panels:
+Tab 1-[Elements]
+	[X]	- Canvas Elements: [Add text, free drawings, basic shapes, images]
+Tab 2-[Options]
+	[ ] - Canvas Options [Delete, Back\Front, Duplicate, Deselect]
+	[ ] - Element Properties: [Id, Opacity, Fill + Text Options]
+Tab 3-[IO]
+	[X] - To Image, SVG
+	[X] - To/From JSON
+	[X] - To/From Browser
+
+1- ((Org - New) / Org)
+1000-500 = 500 / 1000 = 0.5
+500-1000 = -500 / 500 = -1
+1000-1500 = -500 / 1000 = 0.5

@@ -1,0 +1,576 @@
+<div class="content-group">
+    <div class="page-header page-header-default page-header-xs">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-fire position-left"></i>
+                    <span class="text-semibold">GAS REQUEST</span> - Sketch Generator
+                </h5>
+            </div>
+        </div>
+        <div class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a [routerLink]="['/template']">
+                        <i class="icon-chart position-left"></i> Template Selction
+                    </a>
+                </li>
+                <li class="active">
+                    <b>Sketch</b>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="content">
+        <div class="container-detached">
+            <div class="content-detached">
+                <div id="sketchOutputPanel">
+                    <div class="panel panel-flat border-top-xlg border-top-success">
+                        <div class="panel-heading">
+                            <h6 class="panel-title no-margin text-semibold">
+                                <a data-toggle="collapse" data-parent="#accordion-control" href="#sketchPanel">
+                                    <i class="icon-design position-left"></i> Gas Request Sketch
+                                </a>
+                            </h6>
+                        </div>
+
+                        <div id="sketchPanel" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <div id="sketchContainer">
+                                    <canvas id="sketchCanv" class="detail-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-flat border-top-xlg border-top-info">
+                        <div class="panel-heading">
+                            <h6 class="panel-title no-margin text-semibold">
+                                <a data-toggle="collapse" data-parent="#accordion-control" href="#customerInfoPanel">
+                                    <i class="icon-reading position-left"></i> Gas Request Summary
+                                </a>
+                            </h6>
+                        </div>
+
+                        <div id="customerInfoPanel" class="panel-collapse collapse">
+                            <div class="panel-body" style="padding-top: 15px;">
+                                <blockquote class="no-margin no-padding">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <th style="border-top-width: 0;">BCA Number:</th>
+                                                <td class="text-right" style="border-top-width: 0;">
+                                                    <span id="bcaNumberLabel">{{sketchObject.input.customer.bcaNumber}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Customer Name:</th>
+                                                <td class="text-right">
+                                                    <span id="customerNameLabel">{{sketchObject.input.customer.customerName}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Contact Number:</th>
+                                                <td class="text-right">
+                                                    <span id="contactNumberLabel">{{sketchObject.input.customer.contactNumber}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Address:</th>
+                                                <td class="text-right">
+                                                    <span id="streetAddressLabel">{{sketchObject.input.customer.streetAddress}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Main to Curb:</th>
+                                                <td class="text-right">
+                                                    <span id="mainToCurbLabel">{{sketchObject.input.main.mainToCurb}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Nearest Street:</th>
+                                                <td class="text-right">
+                                                    <span id="nearestStreetNameLabel">{{sketchObject.input.site.nearestStreetName}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Template Code:</th>
+                                                <td class="text-right">
+                                                    <span id="templateCodeLabel">N/A</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-flat border-top-xlg border-top-warning">
+                        <div class="panel-heading">
+                            <h6 class="panel-title no-margin text-semibold">
+                                <a data-toggle="collapse" data-parent="#accordion-control" href="#sketchCalcEditorPanel">
+                                    <i class="icon-server position-left"></i> Gas Request Sketch Calculations
+                                </a>
+                            </h6>
+                        </div>
+
+                        <div id="sketchCalcEditorPanel" class="panel-collapse collapse">
+                            <div class="panel-body" style="padding-top: 15px;">
+                                <div id="sketchCalcEditor">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-detached">
+            <div class="sidebar sidebar-default">
+                <div class="sidebar-content">
+                    <div class="tabbable sortable">
+                        <ul class="nav nav-lg nav-tabs nav-justified">
+                            <li class="active">
+                                <a href="#shapes-tab" data-toggle="tab">
+                                    <i class="icon-briefcase3"></i>
+                                    <span class="visible-xs-inline-block position-right">Shapes</span>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#properties-tab" data-toggle="tab">
+                                    <i class="icon-design"></i>
+                                    <span class="visible-xs-inline-block position-right">Properties</span>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#actions-tab" data-toggle="tab">
+                                    <i class="icon-make-group"></i>
+                                    <span class="visible-xs-inline-block position-right">Actions</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane active no-padding" id="shapes-tab">
+                                <div class="sidebar-category">
+                                    <div class="category-title bg-grey-240">
+                                        <span>
+                                            <i class="icon-text-width position-left"></i> Text
+                                        </span>
+                                        <ul class="icons-list">
+                                            <li>
+                                                <a data-action="collapse"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="category-side-content">
+                                        <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button class="btn bg-grey-600" type="button" (click)="addCustomText()">
+                                                    <i class="icon-arrow-left16"></i>
+                                                </button>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Add text to sketch" [(ngModel)]="canvasObject.textString">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="sidebar-category">
+                                    <div class="category-title bg-grey-240">
+                                        <span>
+                                            <i class="icon-pencil position-left"></i> Free Drawing
+                                        </span>
+                                        <ul class="icons-list">
+                                            <li>
+                                                <a data-action="collapse" class="rotate-180"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="category-side-content" style="display: none;">
+                                        <div id="freeDrawingToolPanel">
+                                            <div class="form-horizontal">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">Mode:</label>
+                                                    <div class="col-md-7">
+                                                        <div class="checkbox checkbox-switch">
+                                                            <input id="freeDrawingToggle" type="checkbox" class="switch" [(ngModel)]="sketchObject.isFreeDrawing">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">Stroke color:</label>
+                                                    <div class="col-md-7">
+                                                        <input id="strokColor" type="text" class="form-control colorpicker-show-alpha" value="rgba(255, 0, 0, 0.75)">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">Stroke size:</label>
+                                                    <div class="col-md-7">`
+                                                        <input id="strokSize" type="text" value="5" class="form-control touchspin-postfix">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="category-side-content text-right no-padding-top no-padding-right">
+                                                <div class="btn-group">
+                                                    <button type="button" (click)="clearPaths()" class="btn btn-labeled bg-danger-400">
+                                                        <b>
+                                                            <i class="icon-bin2"></i>
+                                                        </b> Clear
+                                                    </button>
+                                                    <!--<button type="button" (click)="Resize()" class="btn btn-labeled bg-primary-400">
+                                                        <b>
+                                                            <i class="icon-bin2"></i>
+                                                        </b> Resize
+                                                    </button>
+                                                    <button type="button" (click)="zoomIn()" class="btn btn-labeled bg-success-400">
+                                                        <b>
+                                                            <i class="icon-bin2"></i>
+                                                        </b> Zoom In
+                                                    </button> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="sidebar-category">
+                                    <div class="category-title bg-grey-240">
+                                        <span>
+                                            <i class="icon-vector position-left"></i> Basic Shapes
+                                        </span>
+                                        <ul class="icons-list">
+                                            <li>
+                                                <a data-action="collapse" class="rotate-180"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="category-side-content" style="display: none;">
+                                        <div class="row">
+                                            <div class="col-xs-6">
+                                                <button class="btn bg-grey-600 btn-block btn-float btn-float-lg" (click)="addCustomLine()" type="button">
+                                                    <i class="icon-arrow-up-right2"></i>
+                                                    <span>Line</span>
+                                                </button>
+                                                <button class="btn bg-grey-600 btn-block btn-float btn-float-lg" (click)="addCustomRectangle()" type="button">
+                                                    <i class="icon-square"></i>
+                                                    <span>Rectangle</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="col-xs-6">
+                                                <button class="btn bg-grey-600 btn-block btn-float btn-float-lg" (click)="addCustomCircle()" type="button">
+                                                    <i class=" icon-circle2"></i>
+                                                    <span>Circle</span>
+                                                </button>
+                                                <button class="btn bg-grey-600 btn-block btn-float btn-float-lg" (click)="addCustomTriangle()" type="button">
+                                                    <i class="icon-triangle2"></i>
+                                                    <span>Triangle</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="sidebar-category">
+                                    <div class="category-title bg-grey-240">
+                                        <span>
+                                            <i class="icon-images3 position-left"></i> Images</span>
+                                        <ul class="icons-list">
+                                            <li>
+                                                <a data-action="collapse" class="rotate-180"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="category-side-content" style="display: none;">
+                                        <div id="customImagesList" class="max-height">
+                                            <div class="img-wrap">
+                                                <span class="close">&times;</span>
+                                                <img class="images-item" (click)="plotCustomImage($event)" src="assets/images/sketch/tree1.svg">
+                                            </div>
+                                            <div class="img-wrap">
+                                                <span class="close">&times;</span>
+                                                <img class="images-item" (click)="plotCustomImage($event)" src="assets/images/sketch/tree2.svg">
+                                            </div>
+                                            <div class="img-wrap">
+                                                <span class="close">&times;</span>
+                                                <img class="images-item" (click)="plotCustomImage($event)" src="assets/images/sketch/Gas-Pipeline-Caution.png">
+                                            </div>
+                                            <div class="img-wrap">
+                                                <span class="close">&times;</span>
+                                                <img class="images-item" (click)="plotCustomImage($event)" src="assets/images/sketch/driveway.png">
+                                            </div>
+                                            <div class="img-wrap">
+                                                <span class="close">&times;</span>
+                                                <img class="images-item" (click)="plotCustomImage($event)" src="assets/images/sketch/meter.png">
+                                            </div>
+                                            <div class="img-wrap">
+                                                <span class="close">&times;</span>
+                                                <img class="images-item" (click)="plotCustomImage($event)" src="assets/images/sketch/electric.png">
+                                            </div>
+                                            <div class="img-wrap">
+                                                <span class="close">&times;</span>
+                                                <img class="images-item" (click)="plotCustomImage($event)" src="assets/images/sketch/Gas-Pipeline.png">
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="category-side-content text-right no-padding-top no-padding-right">
+                                            <div class="btn-group">
+                                                <button type="button" (click)="importCustomImage($event)" class="btn btn-labeled bg-info-400">
+                                                    <b>
+                                                        <i class="icon-screen-full"></i>
+                                                    </b> Load
+                                                </button>
+                                                <button type="button" (click)="resetCustomImage($event)" class="btn btn-labeled bg-danger-400">
+                                                    <b>
+                                                        <i class="icon-bin2"></i>
+                                                    </b> Reset
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane no-padding" id="properties-tab">
+                                <div class="sidebar-category">
+                                    <div class="category-title">
+                                        <span>Element Actions</span>
+                                        <ul class="icons-list">
+                                            <li>
+                                                <a data-action="collapse"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="category-content">
+                                        <div class="btn-group" role="group" aria-label="...">
+                                            <button data-toggle="tooltip" data-placement="bottom" title="Delete element" type="button" class="btn btn-danger" [disabled]="!canvasObject.selected"
+                                                (click)="removeSelected();">
+                                                <i class="icon-trash" aria-hidden="true"></i>
+                                            </button>
+                                            <button data-toggle="tooltip" data-placement="bottom" title="Send to back" type="button" class="btn btn-default" [disabled]="!canvasObject.selected"
+                                                (click)="sendToBack()">
+                                                <i class="icon-move-down" aria-hidden="true"></i>
+                                            </button>
+                                            <button data-toggle="tooltip" data-placement="bottom" title="Send to front" type="button" class="btn btn-default" [disabled]="!canvasObject.selected"
+                                                (click)="bringToFront()">
+                                                <i class="icon-move-up" aria-hidden="true"></i>
+                                            </button>
+                                            <button data-toggle="tooltip" data-placement="bottom" title="Clone" type="button" class="btn btn-default" [disabled]="!canvasObject.selected || canvasObject.selected.type == 'group'"
+                                                (click)="clone()">
+                                                <i class="icon-copy3" aria-hidden="true"></i>
+                                            </button>
+                                            <button data-toggle="tooltip" data-placement="bottom" title="Unselect" type="button" class="btn btn-default" [disabled]="!canvasObject.selected"
+                                                (click)="clearSelection()">
+                                                <i class="icon-eraser2" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="sidebar-category">
+                                    <div class="category-title">
+                                        <span>Properties</span>
+                                        <ul class="icons-list">
+                                            <li>
+                                                <a data-action="collapse"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="category-content">
+
+                                        <div class="custom-item" *ngIf="canvasObject.selected  && canvasObject.selected.type == 'group'">
+                                            Group Selected
+                                        </div>
+
+                                        <div class="custom-item" *ngIf="!canvasObject.selected">
+                                            No items selected
+                                        </div>
+
+                                        <div class="custom-item" *ngIf="canvasObject.selected && canvasObject.selected.type != 'group'">
+                                            <div class="custom-item-title">ID</div>
+                                            <div class="custom-item-body">
+                                                <input type="text" class="form-control" [(ngModel)]="canvasObject.props.id" (keyup)="setId()" />
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-item" *ngIf="canvasObject.selected && canvasObject.selected.type != 'group'">
+                                            <div class="custom-item-title">Opacity</div>
+                                            <div class="custom-item-body">
+                                                <input type="range" [(ngModel)]="canvasObject.props.opacity" (change)="setOpacity()" /> {{canvasObject.props.opacity}}
+                                            </div>
+                                        </div>
+
+                                        <!-- <div class="custom-item" *ngIf="canvasObject.selected && canvasObject.textEditor || canvasObject.selected && canvasObject.figureEditor">
+                                            <div class="custom-item-title">Fill</div>
+                                            <div class="custom-item-body">
+
+                                            </div>
+                                        </div> -->
+
+                                        <div class="custom-item" *ngIf="canvasObject.selected && canvasObject.textEditor">
+                                            <div class="custom-item-title">Font family</div>
+                                            <div class="custom-item-body">
+                                                <select [(ngModel)]="canvasObject.props.fontFamily" class="form-control" (change)="setFontFamily()">
+                                                    <option value="arial">Arial</option>
+                                                    <option value="helvetica" selected>Helvetica</option>
+                                                    <option value="verdana">Verdana</option>
+                                                    <option value="courier">Courier</option>
+                                                    <option value="Roboto">Roboto</option>
+                                                    <option value="Open Sans">Open Sans</option>
+                                                    <option value="Zilla Slab">Zilla Slab</option>
+                                                    <option value="Lato">Lato</option>
+                                                    <option value="Bellefair">Bellefair</option>
+                                                    <option value="Fresca">Fresca</option>
+                                                    <option value="Raleway">Raleway</option>
+                                                    <option value="Open Sans Condensed">Open Sans Condensed</option>
+                                                    <option value="Indie Flower">Indie Flower</option>
+                                                    <option value="Josefin Sans">Josefin Sans</option>
+                                                    <option value="Inconsolata">Inconsolata</option>
+                                                    <option value="Pacifico">Pacifico</option>
+                                                    <option value="Gloria Hallelujah">Gloria Hallelujah</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-item" *ngIf="canvasObject.selected && canvasObject.textEditor">
+                                            <div class="custom-item-title">Text Align</div>
+                                            <div class="custom-item-body text-center">
+                                                <div class="btn-group" role="group" aria-label="...">
+                                                    <button type="button" class="btn btn-default" [ngClass]="{'active': canvasObject.props.textAlign == 'left' }" (click)="setTextAlign('left')">
+                                                        <i class="icon-paragraph-left2"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default" [ngClass]="{'active': canvasObject.props.textAlign == 'center' }" (click)="setTextAlign('center')">
+                                                        <i class="icon-paragraph-center2"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default" [ngClass]="{'active': canvasObject.props.textAlign == 'right' }" (click)="setTextAlign('right')">
+                                                        <i class="icon-paragraph-right2"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default" [ngClass]="{'active': canvasObject.props.textAlign == 'justify' }" (click)="setTextAlign('justify')">
+                                                        <i class="icon-paragraph-justify2"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-item" *ngIf="canvasObject.selected && canvasObject.textEditor">
+                                            <div class="custom-item-title">Style</div>
+                                            <div class="custom-item-body text-center">
+                                                <div class="btn-group" role="group" aria-label="...">
+                                                    <button type="button" class="btn btn-default btn-sm" [ngClass]="{'active': canvasObject.props.fontWeight }" (click)="setBold()">
+                                                        <i class="icon-bold2"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default btn-sm" [ngClass]="{'active': canvasObject.props.fontStyle }" (click)="setFontStyle()">
+                                                        <i class="icon-italic2"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default btn-sm" [ngClass]="{'active': hasTextDecoration('underline') }" (click)="setTextDecoration('underline')">
+                                                        <i class="icon-underline2"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default btn-sm" [ngClass]="{'active': hasTextDecoration('overline') }" (click)="setTextDecoration('overline')">
+                                                        <i class="icon-superscript2"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default btn-sm" [ngClass]="{'active': hasTextDecoration('line-through') }" (click)="setTextDecoration('line-through')">
+                                                        <i class="icon-strikethrough2"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-item" *ngIf="canvasObject.selected && canvasObject.textEditor">
+                                            <div class="custom-item-title">Font Size</div>
+                                            <div class="custom-item-body">
+                                                <input type="range" [(ngModel)]="canvasObject.props.fontSize" (change)="setFontSize()" step="1" min="1" max="120" /> {{canvasObject.props.fontSize}}
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-item" *ngIf="canvasObject.selected && canvasObject.textEditor">
+                                            <div class="custom-item-title">Line Height</div>
+                                            <div class="custom-item-body">
+                                                <input type="range" [(ngModel)]="canvasObject.props.lineHeight" (change)="setLineHeight()" step="0.1" min="0" max="10" /> {{canvasObject.props.lineHeight}}
+                                            </div>
+                                        </div>
+
+                                        <div class="custom-item" *ngIf="canvasObject.selected && canvasObject.textEditor">
+                                            <div class="custom-item-title">Char Spacing</div>
+                                            <div class="custom-item-body">
+                                                <input type="range" [(ngModel)]="canvasObject.props.charSpacing" (change)="setCharSpacing()" step="10" min="-200" max="800"
+                                                /> {{canvasObject.props.charSpacing}}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane no-padding" id="actions-tab">
+                                <div class="sidebar-category">
+                                    <div class="category-title">
+                                        <span>Sketch Actions</span>
+                                        <ul class="icons-list">
+                                            <li>
+                                                <a data-action="collapse"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="category-side-content">
+                                        <div class="row mb-10">
+                                            <div class="col-xs-6">
+                                                <button class="btn bg-blue-400 btn-block btn-float btn-float-lg btn-smaller-font" (click)="exportJSON()" type="button">
+                                                    <i class="icon-code"></i>
+                                                    <span>To JSON</span>
+                                                </button>
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <button class="btn bg-blue-800 btn-block btn-float btn-float-lg btn-smaller-font" (click)="importJSON()" type="button">
+                                                    <i class="icon-codepen"></i>
+                                                    <span>From JSON</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-10">
+                                            <div class="col-xs-6">
+                                                <button class="btn bg-violet-400 btn-block btn-float btn-float-lg btn-smaller-font" (click)="exportBrowser()" type="button">
+                                                    <i class="icon-browser"></i>
+                                                    <span>To Browser</span>
+                                                </button>
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <button class="btn bg-violet-800 btn-block btn-float btn-float-lg btn-smaller-font" (click)="importBrowser()" type="button">
+                                                    <i class="icon-codepen"></i>
+                                                    <span>From Browser</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-10">
+                                            <div class="col-xs-6">
+                                                <button class="btn bg-pink-400 btn-block btn-float btn-float-lg btn-smaller-font" (click)="exportPNG()" type="button">
+                                                    <i class="icon-screen-full"></i>
+                                                    <span>To PNG</span>
+                                                </button>
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <button class="btn bg-pink-400 btn-block btn-float btn-float-lg btn-smaller-font" (click)="exportSVG()" type="button">
+                                                    <i class="icon-vector"></i>
+                                                    <span>To SVG</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

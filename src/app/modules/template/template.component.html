@@ -1,0 +1,453 @@
+<div class="content-group">
+  <div class="page-header page-header-default page-header-xs">
+    <div class="page-header-content">
+      <div class="page-title">
+        <h5>
+          <i class="icon-fire position-left"></i>
+          <span class="text-semibold">GAS REQUEST</span> - Sketch Template Selection
+        </h5>
+      </div>
+    </div>
+    <div class="breadcrumb-line">
+      <ul class="breadcrumb">
+        <li class="active">
+          <i class="icon-chart position-left"></i>
+          <b>Template Selction</b>
+        </li>
+        <li>
+          <a (click)="generateSketch()">Sketch</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="content">
+    <div class="container-detached">
+      <div id="sketchInputPanel" class="panel panel-flat activePanel">
+        <div class="panel-heading">
+          <h5 class="panel-title">
+            <i class="icon-fire position-left"></i> New Gas Request
+          </h5>
+        </div>
+        <div class="panel-body">
+          <div class="panel-group" id="accordion-styled">
+            <!-- Applicant Details -->
+            <div class="panel">
+              <div class="panel-heading bg-grey-100">
+                <h6 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion-styled" href="#applicantDetails">
+                    <i class="icon-reading position-left"></i>
+                    Applicant Details
+                  </a>
+                </h6>
+              </div>
+              <div id="applicantDetails" class="panel-collapse collapse">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">BCA number:</label>
+                        <input id="bcaNumber" type="text" class="form-control" placeholder="BCA Number" [(ngModel)]="userInput.customer.bcaNumber">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">Date:</label>
+                        <input id="requestDate" type="date" class="form-control" placeholder="Date" [(ngModel)]="userInput.customer.requestDate">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">Assigned to AE:</label>
+                        <select id="accountExecutive" class="form-control" [(ngModel)]="userInput.customer.accountExecutive">
+                          <option value="John Cody">John Cody</option>
+                          <option value="Kim Verran">Kim Verran</option>
+                          <option value="Mark Kelly">Mark Kelly</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">Applicant name:</label>
+                        <input id="customerName" type="text" class="form-control" placeholder="Full name" [(ngModel)]="userInput.customer.customerName">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">Applicant number:</label>
+                        <input id="contactNumber" type="tel" class="form-control" placeholder="Contact number" [(ngModel)]="userInput.customer.contactNumber">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">Applicant e-mail:</label>
+                        <input id="customerEmail" type="email" class="form-control" placeholder="Email address" [(ngModel)]="userInput.customer.customerEmail">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">Street address:</label>
+                        <input id="streetAddress" type="text" class="form-control" placeholder="Street address" [(ngModel)]="userInput.customer.streetAddress">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">County:</label>
+                        <select id="countyList" class="form-control" [(ngModel)]="userInput.customer.county">
+                          <option value="Hunterdon">Hunterdon</option>
+                          <option value="Mercer">Mercer</option>
+                          <option value="Morris">Morris</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">Town:</label>
+                        <select id="townList" class="form-control" [(ngModel)]="userInput.customer.town">
+                          <option value="Carteret">Carteret</option>
+                          <option value="Edison">Edison</option>
+                          <option value="Woodbridge">Woodbridge</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="text-semibold">Zip code:</label>
+                        <input id="zipCode" type="number" class="form-control" placeholder="Zip code" [(ngModel)]="userInput.customer.zipCode">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Site Information -->
+            <div class="panel">
+              <div class="panel-heading bg-grey-100">
+                <h6 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion-styled" href="#siteInformation">
+                    <i class="icon-city position-left"></i>
+                    Site Information
+                  </a>
+                </h6>
+              </div>
+              <div id="siteInformation" class="panel-collapse collapse in">
+                <div class="panel-body form-horizontal">
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Main location:</label>
+                    <div class="col-lg-9">
+                      <select id="streetTemplates" type="number" class="form-control" (change)="onStreetTemplateChange($event.target.selectedIndex)"
+                        [(ngModel)]="userInput.params.streetTemplate">
+                        <option *ngFor="let o of streetTemplatesOptions" [ngValue]=o.id>{{ o.val }}</option>
+                      </select>
+                      <div class="form-control-feedback feedback-primary">
+                        <i class="icon-direction"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Building template:</label>
+                    <div class="col-lg-9">
+                      <select id="buildingTemplates" class="form-control" [(ngModel)]="userInput.params.buildingTemplate">
+                        <option [ngValue]=1>Square (1)-S</option>
+                        <option [ngValue]=2>Garage Left (2)-GL</option>
+                        <option [ngValue]=3>Garage Right (3)-GR</option>
+                      </select>
+                      <div class="form-control-feedback feedback-primary">
+                        <i class="icon-office"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Tap location:</label>
+                    <div class="col-lg-9">
+                      <select id="tapLocation" class="form-control" [(ngModel)]="userInput.params.tapLocationMerged">
+                        <option [ngValue]=1>Short Side | Behind Curb (1)-SSBC</option>
+                        <option [ngValue]=2>Short Side | Under Pavement (2)-SSUP</option>
+                        <option [ngValue]=3>Long Side | Behind Curb (3)-LSBC</option>
+                        <option [ngValue]=4>Long Side | Under Pavement (4)-LSUP</option>
+                      </select>
+                      <div class="form-control-feedback feedback-primary">
+                        <i class="icon-road"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Preferred meter location:</label>
+                    <div class="col-lg-9">
+                      <select id="preferredLocation" class="form-control" (change)="onPreferredLocationChange($event.target)" [(ngModel)]="userInput.site.preferredLocation">
+                        <option [ngValue]=false>No</option>
+                        <option [ngValue]=true>Yes</option>
+                      </select>
+                      <div class="form-control-feedback feedback-primary">
+                        <i class="icon-meter-slow"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Meter location:</label>
+                    <div class="col-lg-9">
+                      <select id="meterLocation" class="form-control" [(ngModel)]="userInput.params.meterLocation">
+                        <option *ngFor="let o of meterLocationOptions; let i = index" [attr.selected]="i == 0 ? true : null" [ngValue]=o.id>{{ o.val }}</option>
+                      </select>
+                      <div class="form-control-feedback feedback-primary">
+                        <i class="icon-meter2"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="userInput.params.meterLocation == 6" class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Service line control points:</label>
+                    <div class="col-lg-9">
+                      <select id="controlPoints" class="form-control" [(ngModel)]="userInput.params.controlPoints">
+                        <option [ngValue]=1>One (1)</option>
+                        <option [ngValue]=2>Two (2)</option>
+                        <option [ngValue]=3>Three (3)</option>
+                        <option [ngValue]=4>Four (4)</option>
+                        <option [ngValue]=5>Five (5)</option>
+                        <option [ngValue]=6>Six (6)</option>
+                      </select>
+                      <div class="form-control-feedback">
+                        <i class="icon-git-merge"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Standard meter setback (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="standardMeterSetback" type="number" class="form-control" placeholder="Standard Meter Setback" [(ngModel)]="userInput.site.standardMeterSetback">
+                      <div class="form-control-feedback">
+                        <i class="icon-arrow-up7"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="userInput.site.preferredLocation" class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Preferred meter setback (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="meterSetback" type="number" class="form-control" placeholder="Preferred Meter Setback" [(ngModel)]="userInput.site.preferredMeterSetback">
+                      <div class="form-control-feedback">
+                        <i class="icon-arrow-up16"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Main extension required:</label>
+                    <div class="col-lg-9">
+                      <select id="mainExtensionRequired" class="form-control" [(ngModel)]="userInput.site.mainExtensionRequired">
+                        <option [ngValue]=false>No</option>
+                        <option [ngValue]=true>Yes</option>
+                      </select>
+                      <div class="form-control-feedback feedback-primary">
+                        <i class="icon-alignment-unalign"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="userInput.site.mainExtensionRequired" class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Main extension length (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="mainExtensionLength" type="number" class="form-control" placeholder="Main Extension Length" [(ngModel)]="userInput.site.mainExtensionLength">
+                      <div class="form-control-feedback">
+                        <i class="icon-design"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">House to curb (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="houseToCurb" type="number" class="form-control" placeholder="House to Curb" [(ngModel)]="userInput.site.houseToCurb">
+                      <div class="form-control-feedback">
+                        <i class="icon-rulers"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Distance to nearest street (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="distanceToNearesrStreet" type="number" class="form-control" placeholder="Distance to Nearest Street" [(ngModel)]="userInput.site.distanceToNearesrStreet">
+                      <div class="form-control-feedback">
+                        <i class="icon-alignment-aligned-to"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Nearest street name:</label>
+                    <div class="col-lg-9">
+                      <input id="nearestStreetName" type="text" class="form-control" placeholder="Nearest Street Name" [(ngModel)]="userInput.site.nearestStreetName">
+                      <div class="form-control-feedback">
+                        <i class="icon-comments"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Information -->
+            <div class="panel">
+              <div class="panel-heading bg-grey-100">
+                <h6 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion-styled" href="#mainInformation">
+                    <i class="icon-design position-left"></i>
+                    Front Street Main Information
+                  </a>
+                </h6>
+              </div>
+              <div id="mainInformation" class="panel-collapse collapse">
+                <div class="panel-body form-horizontal">
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">Street width (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="streetWidth" type="number" class="form-control" placeholder="Street Width" [(ngModel)]="userInput.main.mainStreetWidth">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">Main type:</label>
+                    <div class="col-lg-9">
+                      <select id="mainType" class="form-control" [(ngModel)]="userInput.main.mainType">
+                        <option value="Plastic">Plastic</option>
+                        <option value="Cast Iron">Cast Iron</option>
+                        <option value="Steel">Steel</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">Main size (inch):</label>
+                    <div class="col-lg-9">
+                      <select id="mainSize" class="form-control" [(ngModel)]="userInput.main.mainSize">
+                        <option value="2">2"</option>
+                        <option value="4">4"</option>
+                        <option value="6">6"</option>
+                        <option value="8">8"</option>
+                        <option value="12">12"</option>
+                        <option value="20">20"</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">System NOP:</label>
+                    <div class="col-lg-9">
+                      <select id="systemNOP" class="form-control" [(ngModel)]="userInput.main.mainSystemNOP">
+                        <option value="LP">LP</option>
+                        <option value="EP-25">EP-25</option>
+                        <option value="EP-55">EP-55</option>
+                        <option value="HP">HP</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">Main to curb distance (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="mainToCurb" type="number" class="form-control" placeholder="Main to Curb Distance (feet)" [(ngModel)]="userInput.main.mainToCurb">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Side Street Main Information -->
+            <div class="panel">
+              <div class="panel-heading bg-grey-100">
+                <h6 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion-styled" href="#sideMainInformation">
+                    <i class="icon-hammer-wrench position-left"></i>
+                    Side Street Main Information
+                  </a>
+                </h6>
+              </div>
+              <div id="sideMainInformation" class="panel-collapse collapse">
+                <div class="panel-body form-horizontal">
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">Street width (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="sideStreetWidth" type="number" class="form-control" placeholder="Street Width" [(ngModel)]="userInput.sideMain.sideStreetWidth">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">Main type:</label>
+                    <div class="col-lg-9">
+                      <select id="sideMainType" class="form-control" [(ngModel)]="userInput.sideMain.sideMainType">
+                        <option value="Plastic">Plastic</option>
+                        <option value="Cast Iron">Cast Iron</option>
+                        <option value="Steel">Steel</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">Main size (inch):</label>
+                    <div class="col-lg-9">
+                      <select id="sideMainSize" class="form-control" [(ngModel)]="userInput.sideMain.sideMainSize">
+                        <option value="2">2"</option>
+                        <option value="4">4"</option>
+                        <option value="6">6"</option>
+                        <option value="8">8"</option>
+                        <option value="12">12"</option>
+                        <option value="20">20"</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">System NOP:</label>
+                    <div class="col-lg-9">
+                      <select id="sideSystemNOP" class="form-control" [(ngModel)]="userInput.sideMain.sideSystemNOP">
+                        <option value="LP">LP</option>
+                        <option value="EP-25">EP-25</option>
+                        <option value="EP-55">EP-55</option>
+                        <option value="HP">HP</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">Main to curb distance (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="sideMainToCurb" type="number" class="form-control" placeholder="Main to Curb Distance (feet)" [(ngModel)]="userInput.sideMain.sideMainToCurb">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="text-right">
+            <button id="generateSketch" type="submit" class="btn btn-danger" (click)="generateSketch()">Generate Sketch
+              <i class="icon-arrow-right14 position-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
