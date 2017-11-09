@@ -805,7 +805,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     }
 
     rect.coordinate = this.sketchObject.buildings.main;
-    text.text = `Main Building\nPreferred Location\n${this.sketchObject.input.site.preferredLocation}`;
+    text.text = `Main Building ${this.sketchObject.input.site.preferredLocation ? '\nPreferred Location' : ''}`;
     text.coordinate.x = (this.sketchObject.buildings.main.left + (this.sketchObject.buildings.main.width / 2));
     text.coordinate.y = (this.sketchObject.buildings.main.top + (this.sketchObject.buildings.main.height / 2));
 
@@ -1733,12 +1733,12 @@ export class SketchComponent implements OnInit, AfterViewInit {
       root.getFileBlob(url, function (blob) {
         const reader = new FileReader();
         const elementId = 'Img-' + root.randomId();
-        
+
         reader.onload = function () {
           $('#customImagesList').append('<div class="img-wrap"><span class="close">&times;</span><img id="'
             + elementId + '" class="images-item" src="'
             + reader.result + '"></div>');
-    
+
           const imageElement = root.elementRef.nativeElement.querySelector('#' + elementId);
           if (imageElement) {
             imageElement.addEventListener('click', root.plotCustomImage.bind(root));

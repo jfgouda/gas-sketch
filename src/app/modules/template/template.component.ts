@@ -79,18 +79,20 @@ export class TemplateComponent implements OnInit {
         this.meterLocationOptions = this.streetTemplatesOptions[1].meterLocations;
         break;
       case (3): // Front
-        this.streetTemplatesOptions[2].meterLocations = [{ id: 1, val: "Front (1)-F" }];
+        this.streetTemplatesOptions[2].meterLocations = [];
 
         if (isPreferredLocation) {
           this.streetTemplatesOptions[2].meterLocations.push({ id: 2, val: "Preferred Left (2)-PL" });
           this.streetTemplatesOptions[2].meterLocations.push({ id: 3, val: "Preferred Right (3)-PR" });
+        } else {
+          this.streetTemplatesOptions[2].meterLocations.push({ id: 4, val: "Standard Left (4)-SL" });
+          this.streetTemplatesOptions[2].meterLocations.push({ id: 5, val: "Standard Right (5)-SR" });          
         }
 
-        this.streetTemplatesOptions[2].meterLocations.push({ id: 4, val: "Standard Left (4)-SL" });
-        this.streetTemplatesOptions[2].meterLocations.push({ id: 5, val: "Standard Right (5)-SR" });
+        this.streetTemplatesOptions[2].meterLocations.push({ id: 1, val: "Front (1)-F" });        
 
         if (isPreferredLocation) {
-          this.streetTemplatesOptions[2].meterLocations.push({ id: 6, val: "Custom (6)-CU" });
+          this.streetTemplatesOptions[2].meterLocations.push({ id: 6, val: "Custom (6)-CU" });          
         }
 
         this.meterLocationOptions = this.streetTemplatesOptions[2].meterLocations;
@@ -119,28 +121,28 @@ export class TemplateComponent implements OnInit {
     this.userInput.customer.zipCode = '30301';
 
     this.userInput.params.streetTemplate = 3;
-    this.userInput.params.buildingTemplate = 2;
+    this.userInput.params.buildingTemplate = 3;
     this.userInput.params.tapLocationMerged = 3;
     this.userInput.params.meterLocation = 4;
-    this.userInput.params.controlPoints = 1;
+    this.userInput.params.controlPoints = 2;
 
-    this.userInput.site.mainExtensionRequired = true;
-    this.userInput.site.mainExtensionLength = 38;    
+    this.userInput.site.mainExtensionRequired = false;
+    this.userInput.site.mainExtensionLength = 100;
     this.userInput.site.nearestStreetName = 'Main Street';
-    this.userInput.site.preferredLocation = true;
+    this.userInput.site.preferredLocation = false;
     this.userInput.site.standardMeterSetback = 5;
     this.userInput.site.preferredMeterSetback = 10;
-    this.userInput.site.houseToCurb = 20;
-    this.userInput.site.streetWidth = 30;
-    this.userInput.site.distanceToNearesrStreet = 50;
+    this.userInput.site.houseToCurb = 100;
+    this.userInput.site.streetWidth = 36;
+    this.userInput.site.distanceToNearesrStreet = 285;
 
-    this.userInput.main.mainStreetWidth = 30;
+    this.userInput.main.mainStreetWidth = 38;
     this.userInput.main.mainType = 'Plastic';
     this.userInput.main.mainSize = '4';
     this.userInput.main.mainSystemNOP = 'LP';
     this.userInput.main.mainToCurb = 2;
 
-    this.userInput.sideMain.sideStreetWidth = 30;
+    this.userInput.sideMain.sideStreetWidth = 36;
     this.userInput.sideMain.sideMainType = 'Plastic';
     this.userInput.sideMain.sideMainSize = '4';
     this.userInput.sideMain.sideSystemNOP = 'LP';

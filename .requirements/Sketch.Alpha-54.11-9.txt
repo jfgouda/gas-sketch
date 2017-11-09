@@ -1,0 +1,2 @@
+- Change the default values of fields
+- Hide the standard meter location when is preferred is selected
