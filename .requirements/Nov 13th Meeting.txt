@@ -1,0 +1,18 @@
+- Remove the "New GAS Request" Title from Template
+- Change the Page Title to New Gas Request
+- Main extension required (Radio button) - Drop
+- True\False should be Radio button not DDL
+- Some markets charge from curb to curb plus curb to house
+- Label show total service line length and cost in the future;
+- Sketch the nearest street arrow and distance on the sketch;
+- Reason for preferred meter location, reason to be shown on the sketch; 
+- Meter inside or outside;
+- Collect the reason of preferred not shown on Sketch;
+- Sidewalk yes\no and length; 4 feets;
+- Side-walk -> To be added next to street where Main is behind side-walk
+- 
+
+
+GIS Meeting:
+- Moving pin doesn't reflect address -> What if user entered wrong address then he found out its not then moved the pin, submitting the form will contain correct long-lat but incorrect address.
+- 
