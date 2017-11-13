@@ -364,6 +364,8 @@ export class SketchComponent implements OnInit, AfterViewInit {
     measurementText.isCentered = elm.measurementText.isCentered;
     measurementText.isSmallerFont = elm.measurementText.isSmallerFont;
     measurementText.isSelectable = elm.isSelectable;
+    measurementText.originX = elm.measurementText.originX;
+    measurementText.originY = elm.measurementText.originY;
     measurementText.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
 
     if (returnObject === undefined || returnObject === false) {
@@ -513,6 +515,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     line.isDashed = true;
     line.strokeDashSegmant1 = 2;
     line.strokeDashSegmant2 = 1;
+    line.measurementTextPosition = 1;
 
     text.foregroundColor = this.canvasObject.colors.whiteColor;
     text.isSelectable = false;
@@ -521,11 +524,12 @@ export class SketchComponent implements OnInit, AfterViewInit {
     text.isSmallerFont = true;
     text.isVertical = false;
     text.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
+    text.originX = "left";
 
     legendCoordinate.top = 10;
     legendCoordinate.width = this.sketchObject.canvas.width * 20 / 100;
     legendCoordinate.height = this.sketchObject.canvas.height * 18 / 100;
-    
+
     switch (this.sketchObject.input.params.streetTemplate) {
       case 1: // Standard Right -> Main street bottom and side street on the right
         legendCoordinate.left = 10;
@@ -604,7 +608,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     // Push Legend elements into a Fabric group
     container.height = legendLineCoords.y + margin;
     legendArray.push(container);
-    
+
     legendArray.push(mainGasLine[0]); // Line
     legendArray.push(mainGasLine[1]); // Text
     legendArray.push(mainGasLineExtension[0]);
@@ -758,7 +762,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
 
   // #region |-> [Sketch Calculations]
   // ## Render Sketch: clear the canvas and draw all objects.
-  plotSketchElements() { // Plot sketch elements on the canvas, such as streets and buildings
+  async plotSketchElements() { // Plot sketch elements on the canvas, such as streets and buildings
     this.sketchStreets();
     this.sketchBuilding();
     this.sketchMainServiceLine();
@@ -1514,6 +1518,10 @@ export class SketchComponent implements OnInit, AfterViewInit {
     measurementsLine.measurementText = text;
     this.plotMeasurementLine(measurementsLine);
   }
+
+  sketchServiceLineLength() {
+
+  }
   // #endregion
 
   // #region |-> [UI Actions]
@@ -1784,7 +1792,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     $('#customImagesList').empty();
   }
 
-  appendCustomImages() {
+  async appendCustomImages() {
     // This function should take as a parameter an array or Urls defined by system admin to be added dynamically to sketch
     const imagesList: any = [];
     const root = this;
