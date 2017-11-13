@@ -14,11 +14,14 @@
     "prod-soco": "ng build --prod --base-href /SketchGenerator/",
     "prod-soco-log": "ng build --prod --verbose --progress --named-chunks --base-href /SketchGenerator/",
     "deploy": "firebase deploy",
+    "github-build": "ng build --prod --base-href \"https://jfgouda.github.io/gas-sketch/\"",
+    "github-publish": "ngh",
 
     "debug": "npm run pre-build && npm run start",
     "build": "npm run pre-build && npm run prod && npm run node",
     "build-soco": "npm run pre-build && npm run prod-soco && npm run post-build",
     "build-soco-log": "npm run pre-build && npm run prod-soco-log && npm run post-build",
+    "build-gh": "npm run pre-build && npm run github-build && npm run github-publish",
 
     "publish": "npm run pre-build && npm run prod && npm run deploy",
     "lint": "ng lint"
