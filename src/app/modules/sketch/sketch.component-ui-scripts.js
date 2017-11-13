@@ -27,6 +27,15 @@ var jsModules = {
         $("#freeDrawingToggle").bootstrapSwitch('size', 'mini');
         $("#freeDrawingToggle").bootstrapSwitch('inverse', true);
 
+        // Legend Switch
+        $("#legendToggle").bootstrapSwitch();
+        $("#legendToggle").bootstrapSwitch('onColor', 'danger');
+        $("#legendToggle").bootstrapSwitch('offColor', 'success');
+        $("#legendToggle").bootstrapSwitch('onText', 'Hide Legend');
+        $("#legendToggle").bootstrapSwitch('offText', 'Show Legend');
+        $("#legendToggle").bootstrapSwitch('size', 'mini');
+        //$("#legendToggle").bootstrapSwitch('inverse', true);
+
         $(window).on('resize', function () {
             setTimeout(function () {
                 jsModules.containerHeight();

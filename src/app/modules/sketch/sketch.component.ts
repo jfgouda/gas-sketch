@@ -195,7 +195,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
   }
   //#endregion
   // #region |---> [Canvas Plotting Operations]
-  plotText(elm: CanvasElements.TextElement) {
+  plotText(elm: CanvasElements.TextElement, returnObject?: boolean) {
     let minSize = 9;
     let calcFontSize: number = parseInt((this.sketchObject.canvas.margin / (elm.isSmallerFont ? 2.5 : 1.5)).toFixed(2));
     calcFontSize = calcFontSize < minSize ? minSize : calcFontSize;
@@ -228,7 +228,10 @@ export class SketchComponent implements OnInit, AfterViewInit {
     //   text.top -= text.height / 2;//elm.isVertical ? (text.height / 2) : ; //text.height / 2;
     // }
 
-    this.plotToCanvas(text, elm.type, elm.layer);
+    if (returnObject)
+      return text;
+    else
+      this.plotToCanvas(text, elm.type, elm.layer);
   }
 
   plotRectangle(elm: CanvasElements.RectangleElement) {
@@ -291,7 +294,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     this.plotToCanvas(circle, elm.type, elm.layer);
   }
 
-  plotLine(elm: CanvasElements.LineElement) {
+  plotLine(elm: CanvasElements.LineElement, returnObject?: boolean) {
     let line = new fabric.Line([
       elm.coordinate.x1,
       elm.coordinate.y1,
@@ -304,10 +307,13 @@ export class SketchComponent implements OnInit, AfterViewInit {
         objectCaching: false
       });
 
-    this.plotToCanvas(line, elm.type, elm.layer);
+    if (returnObject)
+      return line;
+    else
+      this.plotToCanvas(line, elm.type, elm.layer);
   }
 
-  plotMeasurementLine(elm: CanvasElements.MeasurementLineElement) {
+  plotMeasurementLine(elm: CanvasElements.MeasurementLineElement, removeLineLimiters?: boolean, returnObject?: boolean) {
     const groupElements = [];
     let lineStart = new SketchData.LineCoordinate();
     let lineEnd = new SketchData.LineCoordinate();
@@ -343,8 +349,11 @@ export class SketchComponent implements OnInit, AfterViewInit {
     // Line start abd end limiter
     lineOptions.stroke = this.shadeColor(this.canvasObject.colors.measurementTopLine, 50);
     lineOptions.strokeDashArray = [];
-    groupElements.push(new fabric.Line([lineStart.x1, lineStart.y1, lineStart.x2, lineStart.y2], lineOptions));
-    groupElements.push(new fabric.Line([lineEnd.x1, lineEnd.y1, lineEnd.x2, lineEnd.y2], lineOptions));
+
+    if (removeLineLimiters === undefined || removeLineLimiters === false) {
+      groupElements.push(new fabric.Line([lineStart.x1, lineStart.y1, lineStart.x2, lineStart.y2], lineOptions));
+      groupElements.push(new fabric.Line([lineEnd.x1, lineEnd.y1, lineEnd.x2, lineEnd.y2], lineOptions));
+    }
 
     // Measurement Line Text
     measurementText.text = `  ${elm.measurementText.text}  `;
@@ -357,11 +366,16 @@ export class SketchComponent implements OnInit, AfterViewInit {
     measurementText.isSelectable = elm.isSelectable;
     measurementText.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
 
-    // Create a group of all ui elements defined above.
-    measurementLineGroup = new fabric.Group(groupElements, { selectable: false, objectCaching: false });
+    if (returnObject === undefined || returnObject === false) {
+      // Create a group of all ui elements defined above.
+      measurementLineGroup = new fabric.Group(groupElements, { selectable: false, objectCaching: false });
 
-    this.plotToCanvas(measurementLineGroup, elm.type, elm.layer);
-    this.plotText(measurementText);
+      this.plotToCanvas(measurementLineGroup, elm.type, elm.layer);
+      this.plotText(measurementText);
+    } else {
+      groupElements.push(this.plotText(measurementText, true));
+      return groupElements;
+    }
   }
 
   plotControlPoints(elm: CanvasElements.ControlPointElement) {
@@ -484,72 +498,133 @@ export class SketchComponent implements OnInit, AfterViewInit {
   }
 
   plotSketchLegend() {
-    const grid: number = this.canvasObject.gridSize;
+    const margin = this.sketchObject.canvas.margin / 2;
+    const lineHeight = 25;
     const legendArray: any = [];
-    let panelCoord = new SketchData.ShapeCoordinate();
-    let legendConfig = {
-      options: {
-        fontColor: "white",
-        fontSize: 10,
+    const line = new CanvasElements.MeasurementLineElement();
+    const text = new CanvasElements.TextElement();
+    let legendLineCoords = new SketchData.PointCoordinate();
+    let legendCoordinate = new SketchData.ShapeCoordinate();
 
-        selectable: false,
-        objectCaching: false
-      },
-      coordinate: { left: 0, top: 0, width: 0, height: 0 }
+    line.thickness = this.sketchObject.mainServiceLine.thickness;
+    line.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
+    line.isSelectable = false;
+    line.strokeColor = this.canvasObject.colors.mainServiceLine;
+    line.isDashed = true;
+    line.strokeDashSegmant1 = 2;
+    line.strokeDashSegmant2 = 1;
 
-    }
+    text.foregroundColor = this.canvasObject.colors.whiteColor;
+    text.isSelectable = false;
+    text.isEditable = false;
+    text.isCentered = true;
+    text.isSmallerFont = true;
+    text.isVertical = false;
+    text.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
 
-    this.canvasObject.canvas.renderOnAddRemove = false;
-
-    // 1- Determine the panel location on the sketch based on user selection:
-    panelCoord.width = this.sketchObject.canvas.width * 20 / 100;
-    panelCoord.height = this.sketchObject.canvas.height * 25 / 100;
-    panelCoord.top = 10;
-    panelCoord.left = 10;
+    legendCoordinate.top = 10;
+    legendCoordinate.width = this.sketchObject.canvas.width * 20 / 100;
+    legendCoordinate.height = this.sketchObject.canvas.height * 18 / 100;
 
     switch (this.sketchObject.input.params.streetTemplate) {
       case 1: // Standard Right -> Main street bottom and side street on the right
+        legendCoordinate.left = 10;
         break;
       case 2: // Standard Left -> Main street bottom and side street on the left
       case 3: // Other -> Main street bottom and no side streets
-
+        legendCoordinate.left = this.sketchObject.canvas.width - legendCoordinate.width - 10;
         break;
       default:
         break;
     }
 
-    // 2- Resize the panel based on screen size
-
-    // 3- Plot legend elements
-    legendArray.push(new fabric.Rect({
-      top: panelCoord.top,
-      left: panelCoord.left,
-      width: panelCoord.width,
-      height: panelCoord.height,
+    let container = new fabric.Rect({
+      top: legendCoordinate.top,
+      left: legendCoordinate.left,
+      width: legendCoordinate.width,
+      height: legendCoordinate.height,
       fill: "black",
       opacity: 0.7,
       selectable: false,
       objectCaching: false
-    }));
+    });
 
-    let factor = 10;
-    legendConfig.coordinate.left = panelCoord.left + 10;
-    legendConfig.coordinate.top = panelCoord.left + 10;
-    legendArray.push(this.plotLegendLineElement(legendConfig));
+    legendLineCoords.x = legendCoordinate.left + margin;
+    legendLineCoords.y = legendCoordinate.top + margin;
+    line.coordinate.x1 = legendLineCoords.x;
+    line.coordinate.x2 = legendCoordinate.left + legendCoordinate.width - margin;
 
+    // Main Legend
+    line.coordinate.y1 = legendLineCoords.y;
+    line.coordinate.y2 = legendLineCoords.y;
+    text.text = "Main";
+    line.measurementText = text;
+    let mainGasLine = this.plotMeasurementLine(line, true, true);
+
+    // Main Extension Legend
+    legendLineCoords.y += lineHeight;
+    line.strokeColor = this.canvasObject.colors.mainExtensionLine;
+    line.coordinate.y1 = legendLineCoords.y;
+    line.coordinate.y2 = legendLineCoords.y;
+    text.text = "Main Extension";
+    line.measurementText = text;
+    let mainGasLineExtension = this.plotMeasurementLine(line, true, true);
+
+    // Service Legend
+    legendLineCoords.y += lineHeight;
+    line.strokeColor = this.canvasObject.colors.mainServiceLine;
+    line.coordinate.y1 = legendLineCoords.y;
+    line.coordinate.y2 = legendLineCoords.y;
+    line.isDashed = false;
+    text.text = "Service";
+    line.measurementText = text;
+    let serviceGasLine = this.plotMeasurementLine(line, true, true);
+
+    // Measurement Legend
+    legendLineCoords.y += lineHeight;
+    line.strokeColor = this.canvasObject.colors.measurementLine;
+    line.coordinate.y1 = legendLineCoords.y;
+    line.coordinate.y2 = legendLineCoords.y;
+    text.text = "Measurement";
+    line.measurementText = text;
+    let measurementLine = this.plotMeasurementLine(line, true, true);
+
+    // Execluded Measurement Legend
+    legendLineCoords.y += lineHeight;
+    line.strokeColor = this.canvasObject.colors.measurementSubtractLine;
+    line.coordinate.y1 = legendLineCoords.y;
+    line.coordinate.y2 = legendLineCoords.y;
+    line.isDashed = true;
+    line.strokeDashSegmant1 = 1;
+    line.strokeDashSegmant2 = 1;
+    text.text = "Omitted Measurement";
+    line.measurementText = text;
+    let OmitMeasurementLine = this.plotMeasurementLine(line, true, true);
+
+    // Push Legend elements into a Fabric group
+    legendArray.push(container);
+    legendArray.push(mainGasLine[0]); // Line
+    legendArray.push(mainGasLine[1]); // Text
+    legendArray.push(mainGasLineExtension[0]); // Line
+    legendArray.push(mainGasLineExtension[1]); // Text
+    legendArray.push(serviceGasLine[0]); // Line
+    legendArray.push(serviceGasLine[1]); // Text
+    legendArray.push(measurementLine[0]); // Line
+    legendArray.push(measurementLine[1]); // Text
+    legendArray.push(OmitMeasurementLine[0]); // Line
+    legendArray.push(OmitMeasurementLine[1]); // Text
+
+    // Construct fabric group
     const gridGroup = new fabric.Group(legendArray, {
       id: 'legend',
       selectable: false,
       objectCaching: false
     });
 
+    // Plot the group
     this.canvasObject.canvas.add(gridGroup);
     this.canvasObject.canvas.renderOnAddRemove = true;
     this.finalizeRendering();
-  }
-
-  plotLegendLineElement(legendConfig: any) {
-
   }
 
   plotToCanvas(obj: any, xtype: string, xlayer: string, xscale?: number) {
@@ -561,7 +636,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
   // #region |---> [Canvas Operations]
   calculateCanvasSize() {
     // Set the canvas width to 80% of the parent container
-    this.canvasObject.canvasSize.width = ($(this.canvasObject.sketchContainerSelector).width() * 80 / 100);
+    this.canvasObject.canvasSize.width = ($(this.canvasObject.sketchContainerSelector).width() * 100 / 100);
 
     // If canvas size is more than the defined max-size, resize.
     this.canvasObject.canvasSize.width =
@@ -626,9 +701,16 @@ export class SketchComponent implements OnInit, AfterViewInit {
   }
 
   toggleLegendPanel(isVisible: boolean) {
+    let root = this;
     this.canvasObject.canvas._objects.forEach(function (element) {
-      if (element.type === 'group' && element.id === 'legend')
+      if (element.type === 'group' && element.id === 'legend') {
         element.opacity = isVisible ? 1 : 0;
+        root.finalizeRendering();
+        if (isVisible)
+          element.bringToFront();
+        else
+          element.sendToBack();
+      }
     });
   }
 
@@ -643,7 +725,8 @@ export class SketchComponent implements OnInit, AfterViewInit {
     this.canvasObject.canvas.clear();
     this.canvasObject.canvas.backgroundColor = this.canvasObject.colors.backColor;
     this.plotGrid();
-    //this.plotSketchLegend();
+    this.plotSketchLegend();
+    this.toggleLegendPanel(false);
     this.finalizeRendering();
   }
 
@@ -1543,6 +1626,10 @@ export class SketchComponent implements OnInit, AfterViewInit {
       root.toggleFreeDrawing(state);
     });
 
+    $("#legendToggle").on('switchChange.bootstrapSwitch', function (event, state) {
+      root.toggleLegendPanel(state);
+    });
+
     // Bind free drawing touch-spin
     $(".touchspin-postfix").TouchSpin({
       min: 1,
@@ -1654,10 +1741,6 @@ export class SketchComponent implements OnInit, AfterViewInit {
     customTriangle.layer = CanvasElements.CanvasLayersEnum.userShapesLayer;
 
     this.plotTriangle(customTriangle);
-  }
-
-  onFreeDrawingToggle(event: any) {
-
   }
   // #endregion
   // #region |---> [Custom Images List Ops]
