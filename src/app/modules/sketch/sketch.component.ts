@@ -525,7 +525,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     legendCoordinate.top = 10;
     legendCoordinate.width = this.sketchObject.canvas.width * 20 / 100;
     legendCoordinate.height = this.sketchObject.canvas.height * 18 / 100;
-
+    
     switch (this.sketchObject.input.params.streetTemplate) {
       case 1: // Standard Right -> Main street bottom and side street on the right
         legendCoordinate.left = 10;
@@ -602,17 +602,19 @@ export class SketchComponent implements OnInit, AfterViewInit {
     let OmitMeasurementLine = this.plotMeasurementLine(line, true, true);
 
     // Push Legend elements into a Fabric group
+    container.height = legendLineCoords.y + margin;
     legendArray.push(container);
+    
     legendArray.push(mainGasLine[0]); // Line
     legendArray.push(mainGasLine[1]); // Text
-    legendArray.push(mainGasLineExtension[0]); // Line
-    legendArray.push(mainGasLineExtension[1]); // Text
-    legendArray.push(serviceGasLine[0]); // Line
-    legendArray.push(serviceGasLine[1]); // Text
-    legendArray.push(measurementLine[0]); // Line
-    legendArray.push(measurementLine[1]); // Text
-    legendArray.push(OmitMeasurementLine[0]); // Line
-    legendArray.push(OmitMeasurementLine[1]); // Text
+    legendArray.push(mainGasLineExtension[0]);
+    legendArray.push(mainGasLineExtension[1]);
+    legendArray.push(serviceGasLine[0]);
+    legendArray.push(serviceGasLine[1]);
+    legendArray.push(measurementLine[0]);
+    legendArray.push(measurementLine[1]);
+    legendArray.push(OmitMeasurementLine[0]);
+    legendArray.push(OmitMeasurementLine[1]);
 
     // Construct fabric group
     const gridGroup = new fabric.Group(legendArray, {
