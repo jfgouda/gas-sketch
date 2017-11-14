@@ -1,5 +1,7 @@
 var jsModules = {
     bindUiElement: function () {
+        // Collapse the side-bar to increase the sketch space:
+        $("body").addClass("sidebar-xs sidebar-detached-hidden");
         // Bind the custom image remove icon
         $('#customImagesList').on('click', '.img-wrap .close', function () {
             $(this).closest('.img-wrap').remove();

@@ -23,6 +23,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
   // Main sketch data model, that hold all claculations, also will be exported to JSON to save sketch.
   public sketchObject: SketchData.SketchModel;     // Hold sketch calculations, to re-generate sketch
   public canvasObject: SketchData.CanvasUIModel;    // Hold canvas UI related data 
+  public measurementsClac: string[] = [];
   // #endregion
 
   // #region |-> [Ctor & Initiation]
@@ -63,25 +64,25 @@ export class SketchComponent implements OnInit, AfterViewInit {
   // ##########################################
   // #region |---> [Canvas Init and Bindings]
   initializeCanvas() {
+    // Fix Fabric.js blurriness issue.
+    // Todo: need to be tested on other devices and retina display!! 
+    fabric.devicePixelRatio = 2.3;
+
     // Setup canvas
     this.canvasObject.canvas = new fabric.Canvas(this.canvasObject.canvasSelector, {
-      imageSmoothingEnabled: true,
+      imageSmoothingEnabled: false,
       renderOnAddRemove: true,
       stateful: false,
       isDrawingMode: false,
       hoverCursor: 'pointer',
       selectionBorderColor: 'rgba(100, 100, 100, 1)',
       selectionColor: 'rgba(100, 100, 100, 0.25)',
-      selectionLineWidth: 0.5,
+      selectionLineWidth: 1,
       freeDrawingBrush: {
         width: 5,
         color: 'rgba(255, 0, 0, 0.5)'
       }
     });
-
-    // Fix Fabric.js blurriness issue.
-    // Todo: need to be tested on other devices and retina display!! 
-    fabric.devicePixelRatio = 2;
 
     this.bindCanvasEvents();
 
@@ -140,6 +141,8 @@ export class SketchComponent implements OnInit, AfterViewInit {
             }
           });
         }
+
+        this.sketchServiceLineLength();
       },
       'object:modified': (e) => { },
       'selection:created': (e) => {
@@ -483,10 +486,10 @@ export class SketchComponent implements OnInit, AfterViewInit {
     this.canvasObject.canvas.renderOnAddRemove = false;
 
     for (let i = 1; i < (this.canvasObject.canvas.width / grid); i++)
-      gridArray.push(new fabric.Line([i * grid, 0, i * grid, this.canvasObject.canvas.height], { stroke: this.canvasObject.colors.gridColor, strokeWidth: 1, selectable: false, objectCaching: false }));
+      gridArray.push(new fabric.Line([i * grid, 0, i * grid, this.canvasObject.canvas.height], { stroke: this.canvasObject.colors.gridColor, strokeWidth: 0.9, selectable: false, objectCaching: false }));
 
     for (let i = 1; i < (this.canvasObject.canvas.height / grid); i++)
-      gridArray.push(new fabric.Line([0, i * grid, this.canvasObject.canvas.width, i * grid], { stroke: this.canvasObject.colors.gridColor, strokeWidth: 1, selectable: false, objectCaching: false }));
+      gridArray.push(new fabric.Line([0, i * grid, this.canvasObject.canvas.width, i * grid], { stroke: this.canvasObject.colors.gridColor, strokeWidth: 0.9, selectable: false, objectCaching: false }));
 
     const gridGroup = new fabric.Group(gridArray, {
       id: 'grid',
@@ -685,7 +688,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     this.sketchObject.mainServiceLine.thickness = this.sketchObject.canvas.width * 0.3 / 100;
     this.sketchObject.mainServiceLine.measurementLineThickness = this.sketchObject.canvas.width * 0.15 / 100;
     this.sketchObject.subServiceLine.thickness = this.sketchObject.canvas.width * 0.2 / 100;
-    this.sketchObject.subServiceLine.customLineControlRadious = this.sketchObject.canvas.width * 0.5 / 100;
+    this.sketchObject.subServiceLine.customLineControlRadious = this.sketchObject.canvas.width * 1 / 100;
   }
 
   changeGridMode(isFreeDrawingMode: boolean) {
@@ -769,6 +772,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     this.sketchSubServiceLine();
     this.sketchMeasurements();
     this.finalizeRendering();
+    this.sketchServiceLineLength();
   }
 
   // ## Skitch Streets: Based on parameters, determine streets coordinates and dimension
@@ -1520,7 +1524,85 @@ export class SketchComponent implements OnInit, AfterViewInit {
   }
 
   sketchServiceLineLength() {
+    let serviceLineLength = 0;
+    let billableServiceLineLength = 0;
+    let streetWidth = 0;
+    let mainToCurb = 0;
 
+    // Get street width
+    switch (this.sketchObject.input.params.streetTemplate) {
+      case 1: // Standard Right -> Main street bottom and side street on the right
+      case 2: // Standard Left -> Main street bottom and side street on the left
+        streetWidth = this.sketchObject.input.sideMain.sideStreetWidth;
+        mainToCurb = this.sketchObject.input.sideMain.sideMainToCurb;
+        break;
+      case 3: // Other -> Main street bottom and no side streets
+        streetWidth = this.sketchObject.input.main.mainStreetWidth;
+        mainToCurb = this.sketchObject.input.main.mainToCurb;
+        break;
+      default:
+    };
+
+    // Determine if street width will be included or not
+    // TODO: based on market, street width will be either included or execluded
+    switch (this.sketchObject.input.params.tapLocationMerged) {
+      case 1: // Short Side | Behind Curb
+        serviceLineLength -= mainToCurb; // Exclude the main to curb distance
+        billableServiceLineLength -= mainToCurb;
+        break;
+      case 2: // Short Side | Under Pavement
+        serviceLineLength += mainToCurb; // Include the main to curb distance
+        break;
+      case 3: // Long Side | Behind Curb
+        serviceLineLength += streetWidth + mainToCurb; // Include street and main to curb distance
+        break;
+      case 4: // Long Side | Under Pavement
+        serviceLineLength += streetWidth - mainToCurb; // Include street and exclude main to curb distance      
+        break;
+      default:
+    };
+
+    switch (this.sketchObject.input.params.meterLocation) {
+      case 1:
+        serviceLineLength += this.sketchObject.input.site.houseToCurb;
+        billableServiceLineLength += this.sketchObject.input.site.houseToCurb;
+        break;
+      case 2:
+      case 3:
+        // TODO: In futur builds, main from side streets will not go directly to side of building instead it might be at back or front of house, so meter setback will be calculated for front street for now  
+        serviceLineLength += this.sketchObject.input.site.houseToCurb + ((this.sketchObject.input.params.streetTemplate === 3) ? (this.sketchObject.input.site.standardMeterSetback + this.sketchObject.input.site.preferredMeterSetback) : 0);
+        billableServiceLineLength += this.sketchObject.input.site.houseToCurb + ((this.sketchObject.input.params.streetTemplate === 3) ? (this.sketchObject.input.site.standardMeterSetback + this.sketchObject.input.site.preferredMeterSetback) : 0);
+        break;
+      case 4:
+      case 5:
+        // TODO: In futur builds, main from side streets will not go directly to side of building instead it might be at back or front of house, so meter setback will be calculated for front street for now
+        serviceLineLength += this.sketchObject.input.site.houseToCurb + ((this.sketchObject.input.params.streetTemplate === 3) ? this.sketchObject.input.site.standardMeterSetback : 0);
+        billableServiceLineLength += this.sketchObject.input.site.houseToCurb + ((this.sketchObject.input.params.streetTemplate === 3) ? this.sketchObject.input.site.standardMeterSetback : 0);
+        break;
+      case 6:
+        let root = this;
+        this.sketchObject.subServiceLine.customLines.customCoords.forEach(function (coord, lineIndex) {
+          let lineLengthFt = 0;
+          let lineLength = root.getLineLength(coord);
+
+          // When service line located short side and behind curb, the service line is missing a piece that connect it to main, we adding it manually.
+          if (root.sketchObject.input.params.mainLocation === 1 && root.sketchObject.input.params.tapLocation === 1 && lineIndex === 0)
+            lineLength += (root.sketchObject.input.params.streetTemplate === 3)
+              ? root.sketchObject.mainServiceLine.coordinate.y1 - coord.y1
+              : root.sketchObject.mainServiceLine.coordinate.x1 - coord.x1;
+
+          lineLengthFt = root.getLineLengthScaledToFeet(lineLength);
+          serviceLineLength += lineLengthFt;
+          billableServiceLineLength += lineLengthFt;
+        });
+        break;
+      default:
+        break;
+    }
+
+    this.measurementsClac.length = 0;
+    this.measurementsClac.push("Total service line length (ft): " + serviceLineLength.toFixed(2));
+    this.measurementsClac.push("Total billable service line length (ft): " + billableServiceLineLength.toFixed(2));
   }
   // #endregion
 

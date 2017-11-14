@@ -16,7 +16,7 @@
                     </a>
                 </li>
                 <li class="active">
-                    <b>Sketch</b>
+                    Sketch
                 </li>
             </ul>
         </div>
@@ -25,11 +25,11 @@
         <div class="container-detached">
             <div class="content-detached">
                 <div id="sketchOutputPanel">
-                    <div class="panel panel-flat border-top-xlg border-top-success">
+                    <div class="panel panel-flat border-top border-top-info">
                         <div class="panel-heading">
                             <h6 class="panel-title no-margin text-semibold">
                                 <a data-toggle="collapse" data-parent="#accordion-control" href="#sketchPanel">
-                                    <i class="icon-design position-left"></i> Gas Request Sketch
+                                    <i class="icon-design position-left"></i> Sketch
                                 </a>
                             </h6>
                             <div class="heading-elements">
@@ -47,6 +47,15 @@
 
                         <div id="sketchPanel" class="panel-collapse collapse in">
                             <div class="panel-body">
+                                <div>
+                                    <div class="alert alert-info alert-styled-left">
+                                        <ul>
+                                            <li *ngFor="let o of measurementsClac">
+                                                {{ o }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                                 <div id="sketchContainer">
                                     <canvas id="sketchCanv" class="detail-canvas"></canvas>
                                 </div>
@@ -54,11 +63,11 @@
                         </div>
                     </div>
 
-                    <div class="panel panel-flat border-top-xlg border-top-info">
+                    <div class="panel panel-flat border-top border-top-info">
                         <div class="panel-heading">
                             <h6 class="panel-title no-margin text-semibold">
                                 <a data-toggle="collapse" data-parent="#accordion-control" href="#customerInfoPanel">
-                                    <i class="icon-reading position-left"></i> Gas Request Summary
+                                    <i class="icon-reading position-left"></i> Summary
                                 </a>
                             </h6>
                         </div>
@@ -117,11 +126,11 @@
                         </div>
                     </div>
 
-                    <div class="panel panel-flat border-top-xlg border-top-warning">
+                    <div class="panel panel-flat border-top border-top-info">
                         <div class="panel-heading">
                             <h6 class="panel-title no-margin text-semibold">
                                 <a data-toggle="collapse" data-parent="#accordion-control" href="#sketchCalcEditorPanel">
-                                    <i class="icon-server position-left"></i> Gas Request Sketch Calculations
+                                    <i class="icon-code position-left"></i> Calculations
                                 </a>
                             </h6>
                         </div>

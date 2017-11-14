@@ -582,8 +582,8 @@ a.bg-danger:focus {
 }
 
 .page-header-xs .page-title {
-    padding-top: 22px;
-    padding-bottom: 22px;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
 .page-title h1,
@@ -2847,7 +2847,7 @@ input[class*=bg-] + .form-control-feedback {
 }
 
 .nav-tabs {
-    margin-bottom: 20px;
+    margin-bottom: 0px;
 }
 
     .nav-tabs > li {
@@ -3798,7 +3798,7 @@ input[class*=bg-] + .form-control-feedback {
 }
 
     .header-highlight .navbar-header:not([class*=bg-]) {
-        background-color: #263238;
+        background-color: #171f23;
         -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.1) inset, 0 -1px 0 rgba(255, 255, 255, 0.1) inset;
         box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.1) inset, 0 -1px 0 rgba(255, 255, 255, 0.1) inset;
     }

@@ -12,11 +12,11 @@ export class CanvasUIModel {
   colors: any = {
     whiteColor: "#fff",
     blackColor: "#000",
-    backColor: "#f8f8f8",
+    backColor: "#fff", //fcfcfc
     freeDrawBackColor: "#ccdddb",
     streetColor: "#3a3a42", //"#e6e6e6",
     streetBorder: "#3a3a42",
-    buildingColor: "white",
+    buildingColor: "#fff",
     objectBorder: "#666666",
     mainServiceLine: "#ff00e1",
     measurementLine: "#47c1ff",
@@ -24,7 +24,7 @@ export class CanvasUIModel {
     measurementSubtractLine: "#ff0000",
     controlPointFill: "white",
     controlPointStroke: "#666",
-    gridColor: "#e1e1e1",
+    gridColor: "#d6d6d6",
     gridDrawingColor: "#ffcccc",
 
     customLine: "#26a499",
