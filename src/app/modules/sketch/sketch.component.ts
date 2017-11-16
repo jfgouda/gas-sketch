@@ -64,15 +64,11 @@ export class SketchComponent implements OnInit, AfterViewInit {
   // ##########################################
   // #region |---> [Canvas Init and Bindings]
   initializeCanvas() {
-    // Fix Fabric.js blurriness issue.
-    // Todo: need to be tested on other devices and retina display!! 
-    fabric.devicePixelRatio = 2.3;
-
     // Setup canvas
     this.canvasObject.canvas = new fabric.Canvas(this.canvasObject.canvasSelector, {
-      imageSmoothingEnabled: false,
+      imageSmoothingEnabled: true,
       renderOnAddRemove: true,
-      stateful: false,
+      stateful: true,
       isDrawingMode: false,
       hoverCursor: 'pointer',
       selectionBorderColor: 'rgba(100, 100, 100, 1)',
@@ -83,6 +79,10 @@ export class SketchComponent implements OnInit, AfterViewInit {
         color: 'rgba(255, 0, 0, 0.5)'
       }
     });
+
+    // Fix Fabric.js blurriness issue.
+    // Todo: need to be tested on other devices and retina display!! 
+    fabric.devicePixelRatio = 2;
 
     this.bindCanvasEvents();
 
@@ -239,13 +239,13 @@ export class SketchComponent implements OnInit, AfterViewInit {
 
   plotRectangle(elm: CanvasElements.RectangleElement) {
     let rect = new fabric.Rect({
-      top: elm.coordinate.top,
-      left: elm.coordinate.left,
-      width: elm.coordinate.width,
-      height: elm.coordinate.height,
+      top: Math.round(elm.coordinate.top),
+      left: Math.round(elm.coordinate.left),
+      width: Math.round(elm.coordinate.width),
+      height: Math.round(elm.coordinate.height),
       fill: elm.fillColor,
       stroke: elm.borderColor,
-      strokeWidth: elm.borderThickness,
+      strokeWidth: Math.round(elm.borderThickness),
       opacity: elm.fillOpacity,
       selectable: elm.isSelectable,
       objectCaching: false
@@ -299,11 +299,11 @@ export class SketchComponent implements OnInit, AfterViewInit {
 
   plotLine(elm: CanvasElements.LineElement, returnObject?: boolean) {
     let line = new fabric.Line([
-      elm.coordinate.x1,
-      elm.coordinate.y1,
-      elm.coordinate.x2,
-      elm.coordinate.y2], {
-        strokeWidth: elm.thickness,
+      Math.round(elm.coordinate.x1),
+      Math.round(elm.coordinate.y1),
+      Math.round(elm.coordinate.x2),
+      Math.round(elm.coordinate.y2)], {
+        strokeWidth: Math.round(elm.thickness),
         strokeDashArray: elm.isDashed ? [elm.thickness * 4, elm.thickness * 2] : [],
         stroke: elm.strokeColor,
         selectable: elm.isSelectable,
@@ -486,10 +486,10 @@ export class SketchComponent implements OnInit, AfterViewInit {
     this.canvasObject.canvas.renderOnAddRemove = false;
 
     for (let i = 1; i < (this.canvasObject.canvas.width / grid); i++)
-      gridArray.push(new fabric.Line([i * grid, 0, i * grid, this.canvasObject.canvas.height], { stroke: this.canvasObject.colors.gridColor, strokeWidth: 0.9, selectable: false, objectCaching: false }));
+      gridArray.push(new fabric.Line([i * grid, 0, i * grid, this.canvasObject.canvas.height], { stroke: this.canvasObject.colors.gridColor, strokeDashArray: [1, 1], strokeWidth: 1, selectable: false, objectCaching: false }));
 
     for (let i = 1; i < (this.canvasObject.canvas.height / grid); i++)
-      gridArray.push(new fabric.Line([0, i * grid, this.canvasObject.canvas.width, i * grid], { stroke: this.canvasObject.colors.gridColor, strokeWidth: 0.9, selectable: false, objectCaching: false }));
+      gridArray.push(new fabric.Line([0, i * grid, this.canvasObject.canvas.width, i * grid], { stroke: this.canvasObject.colors.gridColor, strokeDashArray: [1, 1], strokeWidth: 1, selectable: false, objectCaching: false }));
 
     const gridGroup = new fabric.Group(gridArray, {
       id: 'grid',
@@ -663,32 +663,32 @@ export class SketchComponent implements OnInit, AfterViewInit {
     this.canvasObject.canvasSize.height = this.canvasObject.canvasSize.width / 4 * 3;
 
     // Sync canvas (UI) object with sketch (data) object
-    this.sketchObject.canvas.width = this.canvasObject.canvasSize.width;
-    this.sketchObject.canvas.height = this.canvasObject.canvasSize.height;
+    this.sketchObject.canvas.width = Math.floor(this.canvasObject.canvasSize.width);
+    this.sketchObject.canvas.height = Math.floor(this.canvasObject.canvasSize.height);
 
     // Sketch margin, is an edges spacing value to leave blank before draw objects also used in many calculations. 3% of the canvas size.
-    this.sketchObject.canvas.margin = this.canvasObject.canvasSize.width * 3 / 100;
-    this.canvasObject.gridSize = this.canvasObject.canvasSize.width * 2 / 100;
+    this.sketchObject.canvas.margin = Math.floor(this.canvasObject.canvasSize.width * 3 / 100);
+    this.canvasObject.gridSize = Math.floor(this.canvasObject.canvasSize.width * 2 / 100);
 
     this.canvasObject.canvas.setWidth(this.sketchObject.canvas.width);
     this.canvasObject.canvas.setHeight(this.sketchObject.canvas.height);
 
     // Streets dimensions
-    this.sketchObject.streets.horizontalWidth = this.sketchObject.canvas.width * 18 / 100;    // Main Street
-    this.sketchObject.streets.verticalWidth = this.sketchObject.canvas.width * 15 / 100;      // Side Street
-    this.sketchObject.streets.borderThickness = this.sketchObject.canvas.width * 0.15 / 100;  // Street border thickness
+    this.sketchObject.streets.horizontalWidth = Math.floor(this.sketchObject.canvas.width * 18 / 100);    // Main Street
+    this.sketchObject.streets.verticalWidth = Math.floor(this.sketchObject.canvas.width * 15 / 100);      // Side Street
+    this.sketchObject.streets.borderThickness = Math.floor(this.sketchObject.canvas.width * 0.15 / 100);  // Street border thickness
 
     // Building dimensions
-    this.sketchObject.buildings.main.width = this.sketchObject.canvas.width * 20 / 100;
-    this.sketchObject.buildings.main.height = this.sketchObject.canvas.height * 22 / 100;
-    this.sketchObject.buildings.garage.width = this.sketchObject.buildings.main.width / 2;
-    this.sketchObject.buildings.garage.height = this.sketchObject.buildings.main.height / 2;
+    this.sketchObject.buildings.main.width = Math.floor(this.sketchObject.canvas.width * 20 / 100);
+    this.sketchObject.buildings.main.height = Math.floor(this.sketchObject.canvas.height * 22 / 100);
+    this.sketchObject.buildings.garage.width = Math.floor(this.sketchObject.buildings.main.width / 2);
+    this.sketchObject.buildings.garage.height = Math.floor(this.sketchObject.buildings.main.height / 2);
 
     // Service Lines dimensions
-    this.sketchObject.mainServiceLine.thickness = this.sketchObject.canvas.width * 0.3 / 100;
-    this.sketchObject.mainServiceLine.measurementLineThickness = this.sketchObject.canvas.width * 0.15 / 100;
-    this.sketchObject.subServiceLine.thickness = this.sketchObject.canvas.width * 0.2 / 100;
-    this.sketchObject.subServiceLine.customLineControlRadious = this.sketchObject.canvas.width * 1 / 100;
+    this.sketchObject.mainServiceLine.thickness = Math.floor(this.sketchObject.canvas.width * 0.3 / 100);
+    this.sketchObject.mainServiceLine.measurementLineThickness = Math.floor(this.sketchObject.canvas.width * 0.15 / 100);
+    this.sketchObject.subServiceLine.thickness = Math.floor(this.sketchObject.canvas.width * 0.2 / 100);
+    this.sketchObject.subServiceLine.customLineControlRadious = Math.floor(this.sketchObject.canvas.width * 1 / 100);
   }
 
   changeGridMode(isFreeDrawingMode: boolean) {
@@ -844,13 +844,13 @@ export class SketchComponent implements OnInit, AfterViewInit {
   sketchBuilding() {
     switch (this.sketchObject.input.params.streetTemplate) {
       case 1: // Standard Right -> Main street bottom and side street on the right
-        this.sketchObject.buildings.main.left = (this.sketchObject.canvas.width / 2) - this.sketchObject.streets.verticalWidth - this.sketchObject.buildings.main.width / 2;
+        this.sketchObject.buildings.main.left = Math.floor((this.sketchObject.canvas.width / 2) - this.sketchObject.streets.verticalWidth - this.sketchObject.buildings.main.width / 2);
         break;
       case 2: // Standard Left -> Main street bottom and side street on the left
-        this.sketchObject.buildings.main.left = (this.sketchObject.canvas.width / 2) + this.sketchObject.streets.verticalWidth / 2;
+        this.sketchObject.buildings.main.left = Math.floor((this.sketchObject.canvas.width / 2) + this.sketchObject.streets.verticalWidth / 2);
         break;
       case 3: // Other -> Main street bottom and no side streets
-        this.sketchObject.buildings.main.left = (this.sketchObject.canvas.width / 2) - this.sketchObject.buildings.main.width / 2;
+        this.sketchObject.buildings.main.left = Math.floor((this.sketchObject.canvas.width / 2) - this.sketchObject.buildings.main.width / 2);
         break;
       default:
     }
@@ -865,7 +865,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
       default:
     }
 
-    this.sketchObject.buildings.main.top = (this.sketchObject.canvas.margin * 2.5);
+    this.sketchObject.buildings.main.top = Math.floor(this.sketchObject.canvas.margin * 2.5);
 
     // Define a rectangle, to be used by both main building and garage.
     let rect = new CanvasElements.RectangleElement();
@@ -890,8 +890,8 @@ export class SketchComponent implements OnInit, AfterViewInit {
 
       rect.coordinate = this.sketchObject.buildings.garage;
       text.text = 'Garage';
-      text.coordinate.x = this.sketchObject.buildings.garage.left + (this.sketchObject.buildings.garage.width / 2);
-      text.coordinate.y = this.sketchObject.buildings.garage.top + (this.sketchObject.buildings.garage.height / 2);
+      text.coordinate.x = Math.floor(this.sketchObject.buildings.garage.left + (this.sketchObject.buildings.garage.width / 2));
+      text.coordinate.y = Math.floor(this.sketchObject.buildings.garage.top + (this.sketchObject.buildings.garage.height / 2));
 
       this.plotRectangle(rect);
       this.plotText(text);
@@ -899,8 +899,8 @@ export class SketchComponent implements OnInit, AfterViewInit {
 
     rect.coordinate = this.sketchObject.buildings.main;
     text.text = `Main Building ${this.sketchObject.input.site.preferredLocation ? '\nPreferred Location' : ''}`;
-    text.coordinate.x = (this.sketchObject.buildings.main.left + (this.sketchObject.buildings.main.width / 2));
-    text.coordinate.y = (this.sketchObject.buildings.main.top + (this.sketchObject.buildings.main.height / 2));
+    text.coordinate.x = Math.floor(this.sketchObject.buildings.main.left + (this.sketchObject.buildings.main.width / 2));
+    text.coordinate.y = Math.floor(this.sketchObject.buildings.main.top + (this.sketchObject.buildings.main.height / 2));
 
     this.plotRectangle(rect);
     this.plotText(text);

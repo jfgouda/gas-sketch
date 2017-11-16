@@ -3,7 +3,9 @@
 - Upgrade Angular-CLI to 1.5 instead of 1.49
 - Upgrade Angular 4 to Angular 5
 - Work on legend panel
-
+- Add service line length
+- Work on Async calls for none blocking UI
+- 
 
 - Remove the "New GAS Request" Title from Template
 - Change the Page Title to New Gas Request
