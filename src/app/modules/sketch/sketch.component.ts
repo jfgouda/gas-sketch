@@ -96,6 +96,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
       'object:moving': (e) => {
         // if (e.target.xtype !== CanvasElements.CanvasUiElementsEnum.controlCircle)
         //   return;
+        let root = this;
 
         const target = e.target;
         const origin = this.sketchObject.subServiceLine.customLineControlRadious;
@@ -110,7 +111,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
           this.sketchObject.subServiceLine.customLines.customCoords[e.target.lineIndex].y2 = target.line1.y2;
 
           this.canvasObject.canvas._objects.forEach(element => { // Find line label to move it
-            if (element.type === "text" && element.associatedIndex === `CuMeLa-${e.target.lineIndex}`) {
+            if (element.type === "i-text" && element.associatedIndex === `CuMeLa-${e.target.lineIndex}`) {
 
               element.left = (target.line1.x1 + target.line1.x2) / 2;
               element.top = (target.line1.y1 + target.line1.y2) / 2;
@@ -123,6 +124,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
                   : this.sketchObject.mainServiceLine.coordinate.x1 - target.line1.x1;
 
               element.text = ` ${this.getLineLengthScaledToFeet(lineLength).toString()} ft `;
+              element.bringToFront();
             }
           });
         }
@@ -134,10 +136,11 @@ export class SketchComponent implements OnInit, AfterViewInit {
           this.sketchObject.subServiceLine.customLines.customCoords[e.target.lineIndex + 1].y2 = target.line2.y2;
 
           this.canvasObject.canvas._objects.forEach(element => { // Find line label to move it
-            if (element.type === "text" && element.associatedIndex === `CuMeLa-${e.target.lineIndex + 1}`) {
+            if (element.type === "i-text" && element.associatedIndex === `CuMeLa-${e.target.lineIndex + 1}`) {
               element.left = (target.line2.x1 + target.line2.x2) / 2;
               element.top = (target.line2.y1 + target.line2.y2) / 2;
               element.text = ` ${this.getLineLengthScaledToFeet(this.getLineLength(target.line2)).toString()} ft `;
+              element.bringToFront();
             }
           });
         }
@@ -217,7 +220,8 @@ export class SketchComponent implements OnInit, AfterViewInit {
       textBackgroundColor: elm.backgroundColor,
       objectCaching: false,
       originX: elm.originX ? elm.originX : 'center',
-      originY: elm.originY ? elm.originY : 'center'
+      originY: elm.originY ? elm.originY : 'center',
+      hasControls: false
     };
 
     if (elm.isSmallerFont && calcFontSize === minSize) {
@@ -388,7 +392,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     text.foregroundColor = this.canvasObject.colors.whiteColor;
     text.backgroundColor = this.canvasObject.colors.blackColor;
     text.isSelectable = false;
-    text.isEditable = false;
+    text.isEditable = true;
     text.isCentered = true;
     text.isSmallerFont = true;
     text.isVertical = false;
