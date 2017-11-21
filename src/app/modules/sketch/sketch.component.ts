@@ -94,6 +94,14 @@ export class SketchComponent implements OnInit, AfterViewInit {
   bindCanvasEvents() {
     this.canvasObject.canvas.on({
       'object:moving': (e) => {
+        if (e.target.associatedIndexInt !== undefined) {
+          // User is trying to move the custom line label, return it to its place;
+          let coords = this.sketchObject.subServiceLine.customLines.customCoords[e.target.associatedIndexInt];
+          e.target.set('left', (coords.x1 + coords.x2) / 2);
+          e.target.set('top', (coords.y1 + coords.y2) / 2);
+          e.target.setCoords();
+          return;
+        }
         // if (e.target.xtype !== CanvasElements.CanvasUiElementsEnum.controlCircle)
         //   return;
         let root = this;
@@ -144,14 +152,49 @@ export class SketchComponent implements OnInit, AfterViewInit {
             }
           });
         }
+      },
+      'text:changed': (e) => {
+        if (e.target.associatedIndexInt !== undefined) { // Custom line label is being changed
+          // Prevent multiline.
+          let textOriginal = e.target.text;
 
-        this.sketchServiceLineLength();
+          let textRevised = e.target.text.replace(/(\r\n|\n|\r)/gm, "");
+          e.target.set({ text: textRevised }); // update the iText
+          if (textRevised != textOriginal) e.target.moveCursorLeft(e);
+
+          // Allow only numbers with single dot
+          let numberRevised = e.target.text.replace(',', '.').replace(/[^\d\.]/g, "").replace(/\./, "x").replace(/\./g, "").replace(/x/, ".");
+          e.target.set({ text: numberRevised }); // update the iText
+          if (numberRevised != textOriginal) e.target.moveCursorLeft(e);
+
+          if (e.target.text === "")
+            e.target.set({ text: "0" });
+            
+          // Sync the input value with measurements array and update total line length
+          let numRegex = /[\d|,|.|e|E|\+]+/g;
+          let measurement = e.target.text.match(numRegex);
+
+          this.sketchObject.subServiceLine.customLines.customMeasurements[e.target.associatedIndexInt] = (measurement && measurement.length > 0) ? +measurement[0] : 0;
+          this.sketchServiceLineLength();
+        }
+      },
+      'text:editing:entered': (e) => {
+        let numRegex = /[\d|,|.|e|E|\+]+/g;
+        let measurement = e.target.text.match(numRegex);
+        e.target.text = (measurement && measurement.length > 0) ? measurement[0] : 0;
+        e.target.primeFontSize = e.target["fontSize"];
+        e.target["fontSize"] = e.target.primeFontSize * 2;
+        e.target.selectAll();
+      },
+      'text:editing:exited': (e) => {
+        e.target["fontSize"] = e.target.primeFontSize;
+        e.target.text = ` ${e.target.text} ft `;
       },
       'object:modified': (e) => { },
       'selection:created': (e) => {
-        e.target._objects.forEach(function (elm) {
+        // e.target._objects.forEach(function (elm) {
 
-        });
+        // });
       },
 
       'object:selected': (e) => {
@@ -217,6 +260,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
       angle: elm.isVertical ? 90 : 0,
       selectable: elm.isSelectable,
       associatedIndex: elm.associatedIndex,
+      associatedIndexInt: elm.associatedIndexInt,
       textBackgroundColor: elm.backgroundColor,
       backgroundColor: elm.backgroundColor,
       objectCaching: false,
@@ -225,7 +269,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
       hasControls: false,
       cursorColor: "red",
       editingBorderColor: "red",
-      selectionColor: "rgba(255, 0, 0, 0.3)"  
+      selectionColor: "rgba(255, 0, 0, 0.3)"
     };
 
     if (elm.isSmallerFont && calcFontSize === minSize) {
@@ -413,15 +457,17 @@ export class SketchComponent implements OnInit, AfterViewInit {
       });
 
       this.sketchObject.subServiceLine.customLines.customLines.push(line);
+      this.sketchObject.subServiceLine.customLines.customMeasurements.push(0);
       this.plotToCanvas(line, elm.type, elm.layer);
 
-      let lineLength = this.getLineLength(line);
-      if (this.sketchObject.input.params.mainLocation === 1 && this.sketchObject.input.params.tapLocation === 1 && i === 0)
-        lineLength += (this.sketchObject.input.params.streetTemplate === 3)
-          ? this.sketchObject.mainServiceLine.coordinate.y1 - line.y1
-          : this.sketchObject.mainServiceLine.coordinate.x1 - line.x1;
-
-      text.text = ` ${this.getLineLengthScaledToFeet(lineLength).toString()} ft `;
+      // let lineLength = this.getLineLength(line);
+      // if (this.sketchObject.input.params.mainLocation === 1 && this.sketchObject.input.params.tapLocation === 1 && i === 0)
+      //   lineLength += (this.sketchObject.input.params.streetTemplate === 3)
+      //     ? this.sketchObject.mainServiceLine.coordinate.y1 - line.y1
+      //     : this.sketchObject.mainServiceLine.coordinate.x1 - line.x1;
+      // text.text = ` ${this.getLineLengthScaledToFeet(lineLength).toString()} ft `;
+      text.text = " 0 ft ";
+      text.associatedIndexInt = i;
       text.associatedIndex = `CuMeLa-${i}`;
       text.coordinate.x = (line.x1 + line.x2) / 2;
       text.coordinate.y = (line.y1 + line.y2) / 2;
@@ -1590,18 +1636,18 @@ export class SketchComponent implements OnInit, AfterViewInit {
       case 6:
         let root = this;
         this.sketchObject.subServiceLine.customLines.customCoords.forEach(function (coord, lineIndex) {
-          let lineLengthFt = 0;
-          let lineLength = root.getLineLength(coord);
+          // let lineLengthFt = 0;
+          // let lineLength = root.getLineLength(coord);
 
-          // When service line located short side and behind curb, the service line is missing a piece that connect it to main, we adding it manually.
-          if (root.sketchObject.input.params.mainLocation === 1 && root.sketchObject.input.params.tapLocation === 1 && lineIndex === 0)
-            lineLength += (root.sketchObject.input.params.streetTemplate === 3)
-              ? root.sketchObject.mainServiceLine.coordinate.y1 - coord.y1
-              : root.sketchObject.mainServiceLine.coordinate.x1 - coord.x1;
+          // // When service line located short side and behind curb, the service line is missing a piece that connect it to main, we adding it manually.
+          // if (root.sketchObject.input.params.mainLocation === 1 && root.sketchObject.input.params.tapLocation === 1 && lineIndex === 0)
+          //   lineLength += (root.sketchObject.input.params.streetTemplate === 3)
+          //     ? root.sketchObject.mainServiceLine.coordinate.y1 - coord.y1
+          //     : root.sketchObject.mainServiceLine.coordinate.x1 - coord.x1;
 
-          lineLengthFt = root.getLineLengthScaledToFeet(lineLength);
-          serviceLineLength += lineLengthFt;
-          billableServiceLineLength += lineLengthFt;
+          // lineLengthFt = root.getLineLengthScaledToFeet(lineLength);
+          serviceLineLength += root.sketchObject.subServiceLine.customLines.customMeasurements[lineIndex];
+          billableServiceLineLength += root.sketchObject.subServiceLine.customLines.customMeasurements[lineIndex];
         });
         break;
       default:

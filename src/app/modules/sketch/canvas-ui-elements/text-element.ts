@@ -10,6 +10,7 @@ export class TextElement {
   public fontFamily: string;
   public textAlign: string;
   public associatedIndex: string;
+  public associatedIndexInt: number;
   public isVertical: boolean;
   public isCentered: boolean;
   public isSmallerFont: boolean;
