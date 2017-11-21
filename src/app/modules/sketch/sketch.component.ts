@@ -112,19 +112,19 @@ export class SketchComponent implements OnInit, AfterViewInit {
 
           this.canvasObject.canvas._objects.forEach(element => { // Find line label to move it
             if (element.type === "i-text" && element.associatedIndex === `CuMeLa-${e.target.lineIndex}`) {
+              element.set('left', (target.line1.x1 + target.line1.x2) / 2);
+              element.set('top', (target.line1.y1 + target.line1.y2) / 2);
+              element.setCoords();
 
-              element.left = (target.line1.x1 + target.line1.x2) / 2;
-              element.top = (target.line1.y1 + target.line1.y2) / 2;
-              let lineLength = this.getLineLength(target.line1);
+              // let lineLength = this.getLineLength(target.line1);
 
-              // When service line located short side and behind curb, the service line is missing a piece that connect it to main, we adding it manually.
-              if (this.sketchObject.input.params.mainLocation === 1 && this.sketchObject.input.params.tapLocation === 1 && e.target.lineIndex === 0)
-                lineLength += (this.sketchObject.input.params.streetTemplate === 3)
-                  ? this.sketchObject.mainServiceLine.coordinate.y1 - target.line1.y1
-                  : this.sketchObject.mainServiceLine.coordinate.x1 - target.line1.x1;
+              // // When service line located short side and behind curb, the service line is missing a piece that connect it to main, we adding it manually.
+              // if (this.sketchObject.input.params.mainLocation === 1 && this.sketchObject.input.params.tapLocation === 1 && e.target.lineIndex === 0)
+              //   lineLength += (this.sketchObject.input.params.streetTemplate === 3)
+              //     ? this.sketchObject.mainServiceLine.coordinate.y1 - target.line1.y1
+              //     : this.sketchObject.mainServiceLine.coordinate.x1 - target.line1.x1;
 
-              element.text = ` ${this.getLineLengthScaledToFeet(lineLength).toString()} ft `;
-              element.bringToFront();
+              // element.text = ` ${this.getLineLengthScaledToFeet(lineLength).toString()} ft `;
             }
           });
         }
@@ -137,10 +137,10 @@ export class SketchComponent implements OnInit, AfterViewInit {
 
           this.canvasObject.canvas._objects.forEach(element => { // Find line label to move it
             if (element.type === "i-text" && element.associatedIndex === `CuMeLa-${e.target.lineIndex + 1}`) {
-              element.left = (target.line2.x1 + target.line2.x2) / 2;
-              element.top = (target.line2.y1 + target.line2.y2) / 2;
-              element.text = ` ${this.getLineLengthScaledToFeet(this.getLineLength(target.line2)).toString()} ft `;
-              element.bringToFront();
+              element.set('left', (target.line2.x1 + target.line2.x2) / 2);
+              element.set('top', (target.line2.y1 + target.line2.y2) / 2);
+              element.setCoords();
+              //element.text = ` ${this.getLineLengthScaledToFeet(this.getLineLength(target.line2)).toString()} ft `;
             }
           });
         }
@@ -202,7 +202,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
   //#endregion
   // #region |---> [Canvas Plotting Operations]
   plotText(elm: CanvasElements.TextElement, returnObject?: boolean) {
-    let minSize = 9;
+    let minSize = 11;
     let calcFontSize: number = parseInt((this.sketchObject.canvas.margin / (elm.isSmallerFont ? 2.5 : 1.5)).toFixed(2));
     calcFontSize = calcFontSize < minSize ? minSize : calcFontSize;
 
@@ -218,10 +218,14 @@ export class SketchComponent implements OnInit, AfterViewInit {
       selectable: elm.isSelectable,
       associatedIndex: elm.associatedIndex,
       textBackgroundColor: elm.backgroundColor,
+      backgroundColor: elm.backgroundColor,
       objectCaching: false,
       originX: elm.originX ? elm.originX : 'center',
       originY: elm.originY ? elm.originY : 'center',
-      hasControls: false
+      hasControls: false,
+      cursorColor: "red",
+      editingBorderColor: "red",
+      selectionColor: "rgba(255, 0, 0, 0.3)"  
     };
 
     if (elm.isSmallerFont && calcFontSize === minSize) {
@@ -391,12 +395,12 @@ export class SketchComponent implements OnInit, AfterViewInit {
     const text = new CanvasElements.TextElement();
     text.foregroundColor = this.canvasObject.colors.whiteColor;
     text.backgroundColor = this.canvasObject.colors.blackColor;
-    text.isSelectable = false;
+    text.isSelectable = true;
     text.isEditable = true;
     text.isCentered = true;
     text.isSmallerFont = true;
     text.isVertical = false;
-    text.backgroundOpacity = 0.8;
+    text.backgroundOpacity = 0.9;
     text.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
 
     for (let i = 0; i < elm.pointsCoordinate.length; i++) {

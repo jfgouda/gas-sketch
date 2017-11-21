@@ -123,13 +123,13 @@ export class TemplateComponent implements OnInit {
     this.userInput.params.streetTemplate = 3;
     this.userInput.params.buildingTemplate = 3;
     this.userInput.params.tapLocationMerged = 3;
-    this.userInput.params.meterLocation = 4;
+    this.userInput.params.meterLocation = 6;
     this.userInput.params.controlPoints = 2;
 
     this.userInput.site.mainExtensionRequired = false;
     this.userInput.site.mainExtensionLength = 100;
     this.userInput.site.nearestStreetName = 'Main Street';
-    this.userInput.site.preferredLocation = false;
+    this.userInput.site.preferredLocation = true;
     this.userInput.site.standardMeterSetback = 5;
     this.userInput.site.preferredMeterSetback = 10;
     this.userInput.site.houseToCurb = 100;
