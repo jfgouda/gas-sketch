@@ -14,6 +14,8 @@ export class ControlCircleElement {
   public line2: any;
   public layer: string;
   public lineIndex: number;
+  public associatedIndex: string;
+  public associatedIndexInt: number;
   public readonly type: string;
 
   constructor() {

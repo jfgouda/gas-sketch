@@ -13,6 +13,7 @@ export class CanvasUIModel {
     whiteColor: "#fff",
     blackColor: "#000",
     backColor: "#fff", //fcfcfc
+    redColor: "#f00",
     freeDrawBackColor: "#ccdddb",
     streetColor: "#3a3a42", //"#e6e6e6",
     streetBorder: "#3a3a42",

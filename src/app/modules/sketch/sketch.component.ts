@@ -9,6 +9,7 @@ import * as jQuery from 'jquery';
 import * as JSModules from './sketch.component-ui-scripts';
 import * as SketchData from 'app/modules/sketch/data-models/canvas-data.module';
 import * as CanvasElements from 'app/modules/sketch/canvas-ui-elements/canvas-ui-elements.module';
+import { LineCoordinate } from 'app/modules/sketch/data-models/canvas-data.module';
 
 declare const $: any;
 declare const jquery: any;
@@ -94,7 +95,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
   bindCanvasEvents() {
     this.canvasObject.canvas.on({
       'object:moving': (e) => {
-        if (e.target.associatedIndexInt !== undefined) {
+        if (e.target.type === "i-text" && e.target.associatedIndexInt !== undefined) {
           // User is trying to move the custom line label, return it to its place;
           let coords = this.sketchObject.subServiceLine.customLines.customCoords[e.target.associatedIndexInt];
           e.target.set('left', (coords.x1 + coords.x2) / 2);
@@ -158,18 +159,19 @@ export class SketchComponent implements OnInit, AfterViewInit {
           // Prevent multiline.
           let textOriginal = e.target.text;
 
-          let textRevised = e.target.text.replace(/(\r\n|\n|\r)/gm, "");
-          e.target.set({ text: textRevised }); // update the iText
-          if (textRevised != textOriginal) e.target.moveCursorLeft(e);
+          // let textRevised = e.target.text.replace(/(\r\n|\n|\r)/gm, "");
+          // e.target.set({ text: textRevised }); // update the iText
+          // if (textRevised != textOriginal) e.target.moveCursorLeft(e);
 
           // Allow only numbers with single dot
           let numberRevised = e.target.text.replace(',', '.').replace(/[^\d\.]/g, "").replace(/\./, "x").replace(/\./g, "").replace(/x/, ".");
           e.target.set({ text: numberRevised }); // update the iText
-          if (numberRevised != textOriginal) e.target.moveCursorLeft(e);
+          // if (numberRevised != textOriginal)
+          //   e.target.moveCursorLeft(e);
 
           if (e.target.text === "")
-            e.target.set({ text: "0" });
-            
+            e.target.set({ text: " " });
+
           // Sync the input value with measurements array and update total line length
           let numRegex = /[\d|,|.|e|E|\+]+/g;
           let measurement = e.target.text.match(numRegex);
@@ -177,26 +179,27 @@ export class SketchComponent implements OnInit, AfterViewInit {
           this.sketchObject.subServiceLine.customLines.customMeasurements[e.target.associatedIndexInt] = (measurement && measurement.length > 0) ? +measurement[0] : 0;
           this.sketchServiceLineLength();
         }
-      },
+      }, 
       'text:editing:entered': (e) => {
         let numRegex = /[\d|,|.|e|E|\+]+/g;
-        let measurement = e.target.text.match(numRegex);
-        e.target.text = (measurement && measurement.length > 0) ? measurement[0] : 0;
+        let numberRevised = e.target.text.replace(',', '.').replace(/[^\d\.]/g, "").replace(/\./, "x").replace(/\./g, "").replace(/x/, ".");
+        let measurement = numberRevised.match(numRegex);
+        e.target.set({ text: ((measurement && measurement.length > 0) ? measurement[0] : 0) });
+
         e.target.primeFontSize = e.target["fontSize"];
         e.target["fontSize"] = e.target.primeFontSize * 2;
         e.target.selectAll();
       },
       'text:editing:exited': (e) => {
         e.target["fontSize"] = e.target.primeFontSize;
-        e.target.text = ` ${e.target.text} ft `;
+        console.dir(e.target.text);
+        if (!this.isNumber(e.target.text))
+          e.target.set({ text: ` 0 ft ` });
+        // else
+        //   e.target.set({ text: ` ${e.target.text} ft ` });
       },
       'object:modified': (e) => { },
-      'selection:created': (e) => {
-        // e.target._objects.forEach(function (elm) {
-
-        // });
-      },
-
+      'selection:created': (e) => { },
       'object:selected': (e) => {
         const selectedObject = e.target;
         this.canvasObject.selected = selectedObject;
@@ -239,6 +242,132 @@ export class SketchComponent implements OnInit, AfterViewInit {
       },
       'mouse:down': (e) => {
         let canvasElement: any = document.getElementById('canvas');
+      },
+      'mouse:dblclick': (e) => {
+        // Adding a new custom line segment when click on last control point
+        if (e.target.xtype !== undefined &&
+          e.target.associatedIndexInt !== undefined &&
+          e.target.xtype === "control-circle") { // e.target.associatedIndexInt === this.sketchObject.subServiceLine.customLines.customCoords.length - 1 // Allow user to click any circle
+
+          let segment = 0;
+          let input = prompt("Please enter how many segment you want to add\\remove (+\\-):", "1");
+
+          if (input == null || input == "") {
+            return;
+          }
+
+          if (!this.isNumber(input)) {
+            alert("Please enter a valid number, e.g. 1 to add one segment or -1 to remove segment.");
+          } else {
+            segment = +input;
+
+            if (segment === 0) {
+              return; // Ignore!
+            }
+            else if ((this.sketchObject.subServiceLine.customLines.customCoords.length + segment) > 10) {
+              // Maximum will be reached
+              alert("Considring the segments count provided, the maximum number of control segments will be exceeded. Acceptable range: 1-10, desired range: " +
+                (this.sketchObject.subServiceLine.customLines.customCoords.length + segment));
+              return;
+            }
+            else if (segment < 0 && (this.sketchObject.subServiceLine.customLines.customCoords.length + segment) < 1) {
+              // Minimum will be reached
+              alert("Considring the segments count provided, the minimum number of control segments will be under the limit. Acceptable range: 1-10, desired range: " +
+                (this.sketchObject.subServiceLine.customLines.customCoords.length + segment));
+              return;
+            }
+            else {
+              const controlPoints = new CanvasElements.ControlPointElement();
+              controlPoints.thickness = this.sketchObject.mainServiceLine.thickness;
+              controlPoints.strokeColor = this.canvasObject.colors.mainServiceLine;
+              controlPoints.isDashed = false;
+              controlPoints.isSelectable = false;
+              controlPoints.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
+
+              let multiplier = 1.5;
+              let startIndex = this.sketchObject.subServiceLine.customLines.customCoords.length;
+              let startCoord = this.sketchObject.subServiceLine.customLines.customCoords[startIndex - 1];
+
+              if (segment > 0) {
+                let template = this.sketchObject.input.params.streetTemplate;
+                let pointer = (template === 3) ? startCoord.y2 : startCoord.x2;
+                let coord = new LineCoordinate();
+
+                switch (template) {
+                  case 1: // Right Street
+                    for (let i = 0; i < segment; i++) {
+                      coord = {
+                        x1: pointer,
+                        x2: pointer - (this.sketchObject.canvas.margin * multiplier),
+                        y1: startCoord.y1,
+                        y2: startCoord.y1
+                      }
+
+                      pointer -= (this.sketchObject.canvas.margin * multiplier);
+                      this.sketchObject.subServiceLine.customLines.customCoords.push(coord);
+                    }
+                    break;
+                  case 2: // Left Street
+                    for (let i = 0; i < segment; i++) {
+                      coord = {
+                        x1: pointer,
+                        x2: pointer + (this.sketchObject.canvas.margin * multiplier),
+                        y1: startCoord.y1,
+                        y2: startCoord.y1
+                      }
+
+                      pointer += (this.sketchObject.canvas.margin * multiplier);
+                      this.sketchObject.subServiceLine.customLines.customCoords.push(coord);
+                    }
+                    break;
+                  case 3: // Front Street
+                    for (let i = 0; i < segment; i++) {
+                      coord = {
+                        x1: startCoord.x2,
+                        x2: startCoord.x2,
+                        y1: pointer,
+                        y2: pointer - (this.sketchObject.canvas.margin * multiplier)
+                      }
+
+                      pointer -= (this.sketchObject.canvas.margin * multiplier);
+                      this.sketchObject.subServiceLine.customLines.customCoords.push(coord);
+                    }
+                    break;
+                  default:
+                    break;
+                }
+
+                controlPoints.pointsCoordinate = this.sketchObject.subServiceLine.customLines.customCoords;
+                this.plotControlPoints(controlPoints, startIndex);
+              } else if (segment < 0) {
+                let root = this;
+                let length = this.sketchObject.subServiceLine.customLines.customCoords.length;
+                let start = length + segment;
+                let removedElements = [];
+
+                this.sketchObject.subServiceLine.customLines.customCoords.splice(start, Math.abs(segment));
+                this.sketchObject.subServiceLine.customLines.customLines.splice(start, Math.abs(segment));
+                this.sketchObject.subServiceLine.customLines.customMeasurements.splice(start, Math.abs(segment));
+
+                this.canvasObject.canvas._objects.forEach(function (element) {
+                  if ((element.type === 'circle' || element.type === 'line' || element.type === 'i-text') && element.associatedIndexInt >= start) {
+                    removedElements.push(element);
+                  }
+                  if (element.type === 'circle' && element.associatedIndexInt === start - 1) {
+                    element.line2 = undefined;
+                    element.fill = root.canvasObject.colors.redColor;
+                  }
+                });
+
+                removedElements.forEach(function (element) {
+                  root.canvasObject.canvas.remove(element);
+                });
+              }
+
+              this.sketchServiceLineLength();
+            }
+          }
+        }
       }
     });
   }
@@ -435,7 +564,8 @@ export class SketchComponent implements OnInit, AfterViewInit {
     }
   }
 
-  plotControlPoints(elm: CanvasElements.ControlPointElement) {
+  plotControlPoints(elm: CanvasElements.ControlPointElement, appendIndex?: number) {
+    let root = this;
     const text = new CanvasElements.TextElement();
     text.foregroundColor = this.canvasObject.colors.whiteColor;
     text.backgroundColor = this.canvasObject.colors.blackColor;
@@ -447,12 +577,22 @@ export class SketchComponent implements OnInit, AfterViewInit {
     text.backgroundOpacity = 0.9;
     text.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
 
-    for (let i = 0; i < elm.pointsCoordinate.length; i++) {
+    let index = 0;
+    let length = elm.pointsCoordinate.length;
+
+    if (appendIndex !== undefined) {
+      index = appendIndex;
+      length = elm.pointsCoordinate.length;
+    }
+
+    for (let i = index; i < length; i++) {
       const line = new fabric.Line([elm.pointsCoordinate[i].x1, elm.pointsCoordinate[i].y1, elm.pointsCoordinate[i].x2, elm.pointsCoordinate[i].y2], {
         strokeWidth: elm.thickness,
         strokeDashArray: elm.isDashed ? [elm.thickness * 4, elm.thickness * 2] : [],
         stroke: elm.strokeColor,
         selectable: elm.isSelectable,
+        associatedIndexInt: i,
+        associatedIndex: `CuMeLa-${i}`,
         objectCaching: false
       });
 
@@ -472,6 +612,16 @@ export class SketchComponent implements OnInit, AfterViewInit {
       text.coordinate.x = (line.x1 + line.x2) / 2;
       text.coordinate.y = (line.y1 + line.y2) / 2;
       this.plotText(text);
+
+      if (appendIndex !== undefined && i === index) { // The first segment to be added, attached the first line segmant to previous circle
+        this.canvasObject.canvas._objects.forEach(function (element) {
+          if (element.type === 'circle' && element.associatedIndex === `CuMeLa-${i - 1}`) {
+            element.fill = root.canvasObject.colors.controlPointFill;
+            element.line2 = line;
+            element.bringToFront();
+          }
+        });
+      }
     };
 
     const controlCircle = new CanvasElements.ControlCircleElement();
@@ -484,12 +634,19 @@ export class SketchComponent implements OnInit, AfterViewInit {
     controlCircle.isSelectable = true;
     controlCircle.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
 
-    for (let i = 0; i < elm.pointsCoordinate.length; i++) {
+    for (let i = index; i < length; i++) {
       controlCircle.coordinate.x = elm.pointsCoordinate[i].x2;
       controlCircle.coordinate.y = elm.pointsCoordinate[i].y2;
       controlCircle.line1 = this.sketchObject.subServiceLine.customLines.customLines[i];
       controlCircle.line2 = this.sketchObject.subServiceLine.customLines.customLines[i + 1];
       controlCircle.lineIndex = i;
+      controlCircle.associatedIndexInt = i;
+      controlCircle.associatedIndex = `CuMeLa-${i}`;
+
+      if (i + 1 === length) { // Color last circle differently
+        controlCircle.fillColor = this.canvasObject.colors.redColor;
+      }
+
       this.plotControlCircle(controlCircle);
     }
   }
@@ -509,6 +666,8 @@ export class SketchComponent implements OnInit, AfterViewInit {
       line1: elm.line1,
       line2: elm.line2,
       lineIndex: elm.lineIndex,
+      associatedIndex: elm.associatedIndex,
+      associatedIndexInt: elm.associatedIndexInt,
       objectCaching: false
     });
 
