@@ -318,7 +318,27 @@
               <div id="mainInformation" class="panel-collapse collapse">
                 <div class="panel-body form-horizontal">
 
-                  <div class="form-group">
+                  <div class="form-group has-feedback has-feedback-left">
+                    <label class="col-lg-3 control-label text-semibold">Main run through sidewalk:</label>
+                    <div class="col-lg-9">
+                      <select id="mainSideWalk" class="form-control" [(ngModel)]="userInput.main.mainSideWalk">
+                        <option [ngValue]=false>No</option>
+                        <option [ngValue]=true>Yes</option>
+                      </select>
+                      <div class="form-control-feedback feedback-primary">
+                        <i class="icon-road"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="userInput.main.mainSideWalk === true" class="form-group">
+                    <label class="col-lg-3 control-label text-semibold">Sidewalk width (feet):</label>
+                    <div class="col-lg-9">
+                      <input id="sidewalkWidth" type="number" class="form-control" placeholder="Sidewalk Width" [(ngModel)]="userInput.main.mainSideWalkWidth">
+                    </div>
+                  </div>
+
+                  <div *ngIf="userInput.main.mainSideWalk === false" class="form-group">
                     <label class="col-lg-3 control-label text-semibold">Street width (feet):</label>
                     <div class="col-lg-9">
                       <input id="streetWidth" type="number" class="form-control" placeholder="Street Width" [(ngModel)]="userInput.main.mainStreetWidth">

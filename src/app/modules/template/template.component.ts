@@ -136,6 +136,8 @@ export class TemplateComponent implements OnInit {
     this.userInput.site.streetWidth = 36;
     this.userInput.site.distanceToNearesrStreet = 285;
 
+    this.userInput.main.mainSideWalk = false; 
+    this.userInput.main.mainSideWalkWidth = 4;    
     this.userInput.main.mainStreetWidth = 38;
     this.userInput.main.mainType = 'Plastic';
     this.userInput.main.mainSize = '4';

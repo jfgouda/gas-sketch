@@ -179,7 +179,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
           this.sketchObject.subServiceLine.customLines.customMeasurements[e.target.associatedIndexInt] = (measurement && measurement.length > 0) ? +measurement[0] : 0;
           this.sketchServiceLineLength();
         }
-      }, 
+      },
       'text:editing:entered': (e) => {
         let numRegex = /[\d|,|.|e|E|\+]+/g;
         let numberRevised = e.target.text.replace(',', '.').replace(/[^\d\.]/g, "").replace(/\./, "x").replace(/\./g, "").replace(/x/, ".");
@@ -1024,7 +1024,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     rect.fillOpacity = 1;
     rect.isSelectable = false;
     rect.layer = CanvasElements.CanvasLayersEnum.generatedSketchLayer;
-    rect.fillPatternImagePath = this.canvasObject.sketchStreetPattern;
+    rect.fillPatternImagePath = this.sketchObject.input.main.mainSideWalk ? this.canvasObject.sketchSidewalkPattern : this.canvasObject.sketchStreetPattern;
 
     let text = new CanvasElements.TextElement();
     text.foregroundColor = this.canvasObject.colors.whiteColor;
@@ -1035,7 +1035,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
 
     if (this.sketchObject.input.params.streetTemplate === 1 || this.sketchObject.input.params.streetTemplate === 2) {
       rect.coordinate = this.sketchObject.streets.sideStreet;
-      text.text = this.parseAddress(this.sketchObject.input.site.nearestStreetName).street;
+      text.text = this.sketchObject.input.main.mainSideWalk ? "Sidewalk" : this.parseAddress(this.sketchObject.input.site.nearestStreetName).street;
       text.coordinate.x = (this.sketchObject.streets.sideStreet.left + (this.sketchObject.streets.sideStreet.width / 2) + (this.sketchObject.canvas.margin / 1.5));
       text.coordinate.y = (this.sketchObject.streets.sideStreet.top + (this.sketchObject.streets.sideStreet.height / 2));
       text.isVertical = true;
@@ -1045,7 +1045,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
     }
 
     rect.coordinate = this.sketchObject.streets.mainStreet;
-    text.text = this.parseAddress(this.sketchObject.input.customer.streetAddress).street;
+    text.text = this.sketchObject.input.main.mainSideWalk ? "Sidewalk" : this.parseAddress(this.sketchObject.input.customer.streetAddress).street;
     text.coordinate.x = (this.sketchObject.streets.mainStreet.left + this.sketchObject.canvas.margin * 1.5);
     text.coordinate.y = (this.sketchObject.streets.mainStreet.top + (this.sketchObject.streets.mainStreet.height / 2) - (this.sketchObject.canvas.margin / 1.5));
     text.isVertical = false;
@@ -1709,7 +1709,7 @@ export class SketchComponent implements OnInit, AfterViewInit {
       measurementsLine.strokeDashSegmant2 = 0.5;
       measurementsLine.strokeColor = this.canvasObject.colors.measurementSubtractLine;
     }
-    text.text = `${this.sketchObject.input.main.mainStreetWidth} ft`;
+    text.text = `${this.sketchObject.input.main.mainSideWalk ? this.sketchObject.input.main.mainSideWalkWidth : this.sketchObject.input.main.mainStreetWidth} ft`;
     measurementsLine.measurementText = text;
     this.plotMeasurementLine(measurementsLine);
 

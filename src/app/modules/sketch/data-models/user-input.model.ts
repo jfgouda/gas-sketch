@@ -34,6 +34,8 @@ export class Site {
 }
 
 export class Main {
+    mainSideWalk: boolean;
+    mainSideWalkWidth: number;    
     mainStreetWidth: number;
     mainType: string;
     mainSize: string;

@@ -7,6 +7,8 @@ export class CanvasUIModel {
   customImagesListSelector: string = "#customImagesList";
   sketchCalcEditor: string = "sketchCalcEditor";
   sketchStreetPattern = "assets/images/tile.jpg";
+  sketchSidewalkPattern = "assets/images/sidewalk.jpg";
+  
   gridSize: number = 16;
 
   colors: any = {
